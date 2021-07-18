@@ -1,4 +1,4 @@
-CXX=g++
+CXX=clang++
 
 LD=$(CXX)
 AR=ar
