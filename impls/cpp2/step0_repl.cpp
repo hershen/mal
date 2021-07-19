@@ -20,16 +20,16 @@ std::string rep(const std::string& input) {
   return PRINT(EVAL(READ(input)));
 }
 
-int main(int argc, char *argv[]) {
+int main() {
 
-  std::cout << prompt << "\n";
+  std::cout << prompt;
 
   std::string line;
   while(std::getline(std::cin, line)) {
-    std::cout << prompt << rep(line) << "\n";
+    std::cout << rep(line) << "\n";
+    std::cout << prompt;
   }
 
-  std::cout << std::endl;
   return 0;
 }
 
