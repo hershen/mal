@@ -1,4 +1,4 @@
-CXX=clang++
+CXX=~/llvm/llvm-project/build/bin/clang++
 
 LD=$(CXX)
 AR=ar
@@ -8,7 +8,7 @@ DEBUG=-ggdb
 FLAGS=-Wextra -Wpedantic -Wunused-variable
 
 CXXFLAGS=-O3 $(FLAGS) $(DEBUG) $(INCPATHS) -std=c++20
-LDFLAGS=-O3 $(DEBUG) $(LIBPATHS) -L. -lreadline -lhistory
+LDFLAGS=-O3 $(DEBUG) $(LIBPATHS) -L. 
 
 LIBSOURCES=Core.cpp Environment.cpp Reader.cpp ReadLine.cpp String.cpp \
 			Types.cpp Validation.cpp
@@ -31,7 +31,7 @@ mal: stepA_mal
 .deps: *.cpp *.h
 	$(CXX) $(CXXFLAGS) -MM *.cpp > .deps
 
-$(TARGETS): %: %.o libmal.a
+$(TARGETS): %: %.o 
 	$(LD) $^ -o $@ $(LDFLAGS)
 
 libmal.a: $(LIBOBJS)
@@ -41,6 +41,6 @@ libmal.a: $(LIBOBJS)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:
-	rm -rf *.o $(TARGETS) libmal.a .deps mal
+	rm -rf *.o $(TARGETS) .deps mal
 
 -include .deps
