@@ -7,40 +7,20 @@ DEBUG=-ggdb
 
 FLAGS=-Wextra -Wpedantic -Wunused-variable
 
-CXXFLAGS=-O3 $(FLAGS) $(DEBUG) $(INCPATHS) -std=c++20
-LDFLAGS=-O3 $(DEBUG) $(LIBPATHS) -L. 
+CXXFLAGS=-O3 $(FLAGS) $(DEBUG) $(INCPATHS) -std=c++20 -stdlib=libc++
+LDFLAGS=-O3 $(DEBUG) $(LIBPATHS) -L. -stdlib=libc++
 
-LIBSOURCES=Core.cpp Environment.cpp Reader.cpp ReadLine.cpp String.cpp \
-			Types.cpp Validation.cpp
-LIBOBJS=$(LIBSOURCES:%.cpp=%.o)
+.PHONY:	clean all
 
-MAINS=$(wildcard step*.cpp)
-TARGETS=$(MAINS:%.cpp=%)
-
-.PHONY:	all clean
-
-.SUFFIXES: .cpp .o
+TARGETS=$(basename $(wildcard step*.cpp))
 
 all: $(TARGETS)
 
-dist: mal
-
-mal: stepA_mal
-	cp $< $@
-
-.deps: *.cpp *.h
-	$(CXX) $(CXXFLAGS) -MM *.cpp > .deps
-
-$(TARGETS): %: %.o 
-	$(LD) $^ -o $@ $(LDFLAGS)
-
-libmal.a: $(LIBOBJS)
-	$(AR) rcs $@ $^
-
-.cpp.o:
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+step0_repl: step0_repl.cpp
+	$(CXX) $(CXXFLAGS) $< -o $@
+	
+step1_read_pring: step1_read_pring.cpp types.h reader.h printer.h
+	$(CXX) $(CXXFLAGS) $< -o $@
 
 clean:
-	rm -rf *.o $(TARGETS) .deps mal
-
--include .deps
+	rm  -f *.o $(TARGETS) 
