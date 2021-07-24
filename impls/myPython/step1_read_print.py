@@ -19,9 +19,7 @@ if __name__ == "__main__":
     while True:
         try: 
             line = input('user> ')
+            print(rep(line))
         except EOFError:
-            print('EOFError')
             break
-
-        print(rep(line))
 

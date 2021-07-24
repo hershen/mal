@@ -1,10 +1,9 @@
-
+import mal_types
 
 special_charecters = '[]{}()\'`~^@'
 
 class Reader():
     def __init__(self, tokens):
-        print('tokens = ', tokens)
         self.tokens = tokens
         self.current_index = 0
 
@@ -21,7 +20,6 @@ class Reader():
         return self.current_index >= len(self.tokens)
 
 def tokenize(line, tokens=[]):
-    print(line, tokens)
     line = line.lstrip(' \t\n\r,')
 
     if len(line) == 0:
@@ -43,27 +41,30 @@ def tokenize(line, tokens=[]):
 
     # Double quotes
     if line[0] == '"':
-        tmp_start_index = idx + 1
+        tmp_start_index = 1
         while True:
             next_double_quote_index = line.find('"', tmp_start_index)
             if next_double_quote_index == -1:
-                raise('Found unbalenced double quotes')
+                #raise exception
+                return tokenize('', line)
 
             before_double_quotes_index = next_double_quote_index - 1
             if line[before_double_quotes_index] != '\\':
-                return tokenize(line[:next_double_quote_index], tokens + [line[idx:next_double_quote_index]])
+                return tokenize(line[:next_double_quote_index], tokens + [line[:next_double_quote_index]])
             else:
                 #Found \" - continue searching for closing "
                 pass
 
     # Non-special charecter sequence
     else:
-        for char in special_charecters + ' \'",;':
-            end_of_sequence_index = line.find(char)
-            if end_of_sequence_index >= 0:
-                return tokenize(line[end_of_sequence_index:], tokens + [line[:end_of_sequence_index]])
-        # line is one long sequence
-        return tokenize('', tokens + [line])
+        end_sequence_chars_indices = sorted([line.find(char) for char in (special_charecters + ' \'",;') if line.find(char) != -1])
+
+        if not end_sequence_chars_indices: # line is one long sequence
+            return tokenize('', tokens + [line])
+
+        first_end_sequence_char_index = end_sequence_chars_indices[0]
+
+        return tokenize(line[first_end_sequence_char_index:], tokens + [line[:first_end_sequence_char_index]])
 
 def read_form(reader):
     if reader.empty():
@@ -77,7 +78,7 @@ def read_form(reader):
         return read_atom(reader)
 
 def read_list(reader):
-    mal_list = [reader.next()] # mal_list should now be ['(']
+    mal_list = mal_types.List(reader.next()) # mal_list should now be ['(']
     while True:
         mal_list.append(read_form(reader))
         if mal_list[-1] == ')':
