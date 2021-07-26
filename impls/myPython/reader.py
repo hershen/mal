@@ -45,15 +45,14 @@ def tokenize(line, tokens=[]):
         while True:
             next_double_quote_index = line.find('"', tmp_start_index)
             if next_double_quote_index == -1:
-                #raise exception
-                return tokenize('', line)
+                raise ValueError('unbalanced "')
 
             before_double_quotes_index = next_double_quote_index - 1
             if line[before_double_quotes_index] != '\\':
-                return tokenize(line[:next_double_quote_index], tokens + [line[:next_double_quote_index]])
+                return tokenize(line[next_double_quote_index+1:], tokens + [line[:next_double_quote_index+1]])
             else:
                 #Found \" - continue searching for closing "
-                pass
+                tmp_start_index = next_double_quote_index + 1
 
     # Non-special charecter sequence
     else:
@@ -72,23 +71,35 @@ def read_form(reader):
 
     next_token = reader.peek()
     
-    if next_token[0] == '(':
+    if next_token[0] in '([':
         return read_list(reader)
     else:
         return read_atom(reader)
 
 def read_list(reader):
-    mal_list = mal_types.List(reader.next()) # mal_list should now be ['(']
+    mal_list = mal_types.List(reader.next()) # mal_list should now be ['('] or ['[']
     while True:
-        mal_list.append(read_form(reader))
-        if mal_list[-1] == ')':
+        mal_object = read_form(reader)
+        is_string = isinstance(mal_object, str)
+
+        if is_string and mal_object == '': #reached reader end
+            raise ValueError(f'unbalanced "{mal_types.closing_paren_style[mal_list[0]]}"')
+
+        mal_list.append(mal_object)
+        if is_string and mal_object in ')]':
             break
     return mal_list        
 
 def read_atom(reader):
     token = reader.next()
-    if token[0].isdigit():
-        return int(token)
+    if token[0].isdigit() or (len(token)>2 and token[0] == '-' and token[1].isdigit()):
+        return mal_types.Int(token)
+
+    elif token[0] == '"':
+        string = token.replace('\\"', '"') \
+                      .replace('\\\\', '\\')
+        return mal_types.String(string)
+
     else:
         return token
 
