@@ -14,4 +14,5 @@ class List(list):
         list.__init__(self, *args)
     
     def __str__(self):
-        return '(' + ' '.join([str(x) for x in [*self][1:-1]]) + ')'
+        the_list = [*self]
+        return the_list[0] + ' '.join([str(x) for x in the_list[1:-1]]) + closing_paren_style[the_list[0]]
