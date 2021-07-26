@@ -1,5 +1,6 @@
 closing_paren_style = {'(': ')',
-                       '[': ']'}
+                       '[': ']',
+                       '{': '}'}
 
 class Int(int):
     def __new__(cls, value):

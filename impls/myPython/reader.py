@@ -71,7 +71,7 @@ def read_form(reader):
 
     next_token = reader.peek()
     
-    if next_token[0] in '([':
+    if next_token[0] in mal_types.closing_paren_style.keys():
         return read_list(reader)
     else:
         return read_atom(reader)
@@ -86,7 +86,7 @@ def read_list(reader):
             raise ValueError(f'unbalanced "{mal_types.closing_paren_style[mal_list[0]]}"')
 
         mal_list.append(mal_object)
-        if is_string and mal_object in ')]':
+        if is_string and mal_object in mal_types.closing_paren_style.values():
             break
     return mal_list        
 
