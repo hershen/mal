@@ -77,18 +77,24 @@ def read_form(reader):
         return read_atom(reader)
 
 def read_list(reader):
-    mal_list = mal_types.List(reader.next()) # mal_list should now be ['('] or ['[']
+    open_paren = reader.next() # This should be the opening paren type ( [ {
+    if open_paren == '(':
+        mal_list_variant = mal_types.List(open_paren)
+    elif open_paren == '[':
+        mal_list_variant = mal_types.Vector(open_paren)
+    elif open_paren == '{':
+        mal_list_variant = mal_types.Hash_map(open_paren)
     while True:
         mal_object = read_form(reader)
         is_string = isinstance(mal_object, str)
 
         if is_string and mal_object == '': #reached reader end
-            raise ValueError(f'unbalanced "{mal_types.closing_paren_style[mal_list[0]]}"')
+            raise ValueError(f'unbalanced "{mal_types.closing_paren_style[mal_list_variant[0]]}"')
 
-        mal_list.append(mal_object)
+        mal_list_variant.append(mal_object)
         if is_string and mal_object in mal_types.closing_paren_style.values():
             break
-    return mal_list        
+    return mal_list_variant
 
 def read_atom(reader):
     token = reader.next()
