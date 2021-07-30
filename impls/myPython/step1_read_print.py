@@ -7,7 +7,6 @@ def READ(line):
     return reader.read_str(str(line))
 
 def EVAL(mal_type):
-    # print(type(mal_type))
     return mal_type
 
 def PRINT(mal_type):
