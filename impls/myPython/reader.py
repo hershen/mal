@@ -47,8 +47,7 @@ def tokenize(line, tokens=[]):
             if next_double_quote_index == -1:
                 raise ValueError('unbalanced "')
 
-            before_double_quotes_index = next_double_quote_index - 1
-            if line[before_double_quotes_index] != '\\':
+            if line[next_double_quote_index - 1] != '\\' or line[next_double_quote_index - 2 : next_double_quote_index] == '\\\\':
                 return tokenize(line[next_double_quote_index+1:], tokens + [line[:next_double_quote_index+1]])
             else:
                 #Found \" - continue searching for closing "
