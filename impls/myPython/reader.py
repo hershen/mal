@@ -95,15 +95,22 @@ def read_list(reader):
             break
     return mal_list_variant
 
+slash_preceded_charecters = ['\\', 'n']
+
 def read_atom(reader):
     token = reader.next()
     if token[0].isdigit() or (len(token)>2 and token[0] == '-' and token[1].isdigit()):
         return mal_types.Int(token)
 
     elif token[0] == '"':
-        string = token.replace('\\"', '"') \
-                      .replace('\\\\', '\\')
-        return mal_types.String(string)
+        output_string = ''
+        for idx, char in enumerate(token):
+            if char == '\\':
+                if token[idx+1] in slash_preceded_charecters: #don't add the '\\' charecter to the output string
+                    continue
+            output_string += char
+                      
+        return mal_types.String(output_string)
 
     else:
         return token
