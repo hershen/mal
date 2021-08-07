@@ -95,7 +95,23 @@ def read_list(reader):
             break
     return mal_list_variant
 
-slash_preceded_charecters = ['\\', 'n']
+slash_preceded_charecters = ['\\', '"']
+
+def remove_escape_backslash(input_string):
+    output_string = ''
+    iterator = iter(input_string)
+    for char in iterator:
+        if char == '\\':
+            next_char = next(iterator, None)
+            if next_char in slash_preceded_charecters:
+                char = next_char #skip the '\' character
+            else: # "undo" advancing the iterator
+                output_string += char
+                char = next_char
+
+        output_string += char
+    return output_string
+
 
 def read_atom(reader):
     token = reader.next()
@@ -103,13 +119,9 @@ def read_atom(reader):
         return mal_types.Int(token)
 
     elif token[0] == '"':
-        output_string = ''
-        for idx, char in enumerate(token):
-            if char == '\\':
-                if token[idx+1] in slash_preceded_charecters: #don't add the '\\' charecter to the output string
-                    continue
-            output_string += char
-                      
+        output_string = remove_escape_backslash(token)
+        if output_string[-1] != '"':
+            raise ValueError('unbalanced "')
         return mal_types.String(output_string)
 
     else:

@@ -7,6 +7,7 @@ def pr_str(mal_type, print_readably):
     if print_readably and isinstance(mal_type, mal_types.String):
         string_representation = '"' + string_representation[1:-1].replace('\\', '\\\\') \
                                                                  .replace('"', '\\"') \
+                                                                 .replace('\\\\n', '\\n') \
                               + '"'
     # print(' after = ', string_representation)
 
