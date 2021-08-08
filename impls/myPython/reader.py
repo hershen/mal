@@ -109,8 +109,12 @@ def remove_escape_backslash(input_string):
                 output_string += char
                 char = next_char
 
-        output_string += char
-    return output_string
+        try:
+            output_string += char
+        except TypeError: #char is NoneType
+            raise ValueError('unbalanced "')
+
+    return ''.join(output_string)
 
 
 def read_atom(reader):
@@ -119,9 +123,7 @@ def read_atom(reader):
         return mal_types.Int(token)
 
     elif token[0] == '"':
-        output_string = remove_escape_backslash(token)
-        if output_string[-1] != '"':
-            raise ValueError('unbalanced "')
+        output_string = '"' + remove_escape_backslash(token[1:-1]) + '"'
         return mal_types.String(output_string)
 
     else:
