@@ -72,6 +72,9 @@ def read_form(reader):
     
     if next_token[0] in mal_types.closing_paren_style.keys():
         return read_list(reader)
+    elif next_token[0] == "'":
+        reader.next()
+        return mal_types.List(['(', 'quote', read_form(reader), ')'])
     else:
         return read_atom(reader)
 
