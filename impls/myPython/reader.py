@@ -81,6 +81,11 @@ def read_form(reader):
     elif next_token in quote_symbol_to_word.keys():
         quote_symbol = reader.next() #advance reader
         return mal_types.List(['(', quote_symbol_to_word[quote_symbol], read_form(reader), ')'])
+    elif next_token == '^':
+        reader.next()
+        first_arg = read_form(reader)
+        second_arg = read_form(reader)
+        return mal_types.List(['(', 'with-meta', second_arg, first_arg, ')'])
     else:
         return read_atom(reader)
 
