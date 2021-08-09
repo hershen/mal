@@ -64,6 +64,11 @@ def tokenize(line, tokens=[]):
 
         return tokenize(line[first_end_sequence_char_index:], tokens + [line[:first_end_sequence_char_index]])
 
+quote_symbol_to_word = {"'":  'quote',
+                        '`':  'quasiquote',
+                        '~':  'unquote',
+                        '~@': 'splice-unquote'
+                        }
 def read_form(reader):
     if reader.empty():
         return ''
@@ -72,9 +77,9 @@ def read_form(reader):
     
     if next_token[0] in mal_types.closing_paren_style.keys():
         return read_list(reader)
-    elif next_token[0] == "'":
-        reader.next()
-        return mal_types.List(['(', 'quote', read_form(reader), ')'])
+    elif next_token in quote_symbol_to_word.keys():
+        quote_symbol = reader.next() #advance reader
+        return mal_types.List(['(', quote_symbol_to_word[quote_symbol], read_form(reader), ')'])
     else:
         return read_atom(reader)
 
