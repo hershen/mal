@@ -67,7 +67,8 @@ def tokenize(line, tokens=[]):
 quote_symbol_to_word = {"'":  'quote',
                         '`':  'quasiquote',
                         '~':  'unquote',
-                        '~@': 'splice-unquote'
+                        '~@': 'splice-unquote',
+                        '@':  'deref'
                         }
 def read_form(reader):
     if reader.empty():
