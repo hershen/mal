@@ -151,9 +151,8 @@ def read_atom(reader):
     """
     Returns mal_type
     """
-
     token = reader.next()
-    if token[0].isdigit() or (len(token)>2 and token[0] == '-' and token[1].isdigit()):
+    if token[0].isdigit() or (len(token)>1 and token[0] == '-' and token[1].isdigit()):
         return mal_types.Int(token)
 
     elif token[0] == '"':
