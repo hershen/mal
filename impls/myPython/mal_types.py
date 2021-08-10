@@ -7,9 +7,8 @@ class Int(int):
         return int.__new__(cls, value)
 
 class String(str):
-    def __init(self, *args):
-        str.__init(self, *args)
-
+    def __init__(self, *args):
+        str.__init__(self, *args)
 
 class List_variant(list):
     def __init__(self, *args):
