@@ -20,6 +20,9 @@ class Symbol():
     def __eq__(self, other):
         return self.string == other
 
+    def __hash__(self):
+        return hash(self.string)
+
 class List_variant(list):
     def __init__(self, *args):
         list.__init__(self, *args)
