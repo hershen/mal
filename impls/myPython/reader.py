@@ -80,33 +80,34 @@ def read_form(reader):
         return read_list(reader)
     elif next_token in quote_symbol_to_word.keys():
         quote_symbol = reader.next() #advance reader
-        return mal_types.List(['(', quote_symbol_to_word[quote_symbol], read_form(reader), ')'])
+        return mal_types.List([quote_symbol_to_word[quote_symbol], read_form(reader)])
     elif next_token == '^':
         reader.next()
         first_arg = read_form(reader)
         second_arg = read_form(reader)
-        return mal_types.List(['(', 'with-meta', second_arg, first_arg, ')'])
+        return mal_types.List(['with-meta', second_arg, first_arg])
     else:
         return read_atom(reader)
 
 def read_list(reader):
     open_paren = reader.next() # This should be the opening paren type ( [ {
     if open_paren == '(':
-        mal_list_variant = mal_types.List(open_paren)
+        mal_list_variant = mal_types.List()
     elif open_paren == '[':
-        mal_list_variant = mal_types.Vector(open_paren)
+        mal_list_variant = mal_types.Vector()
     elif open_paren == '{':
-        mal_list_variant = mal_types.Hash_map(open_paren)
+        mal_list_variant = mal_types.Hash_map()
     while True:
         mal_object = read_form(reader)
         is_string = isinstance(mal_object, str)
 
         if is_string and mal_object == '': #reached reader end
-            raise ValueError(f'unbalanced "{mal_types.closing_paren_style[mal_list_variant[0]]}"')
+            raise ValueError(f'unbalanced "{mal_list_variant.open_paren}"')
 
-        mal_list_variant.append(mal_object)
         if is_string and mal_object in mal_types.closing_paren_style.values():
             break
+
+        mal_list_variant.append(mal_object)
     return mal_list_variant
 
 slash_preceded_charecters = ['\\', '"']

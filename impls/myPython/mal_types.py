@@ -16,16 +16,31 @@ class List_variant(list):
     
     def __str__(self):
         the_list = [*self]
-        return the_list[0] + ' '.join([str(x) for x in the_list[1:-1]]) + the_list[-1]
+        return ' '.join([str(x) for x in the_list])
 
 class List(List_variant):
+    open_paren = '('
+    close_paren = ')'
     def __init__(self, *args):
         super().__init__(*args)
+
+    def __str__(self):
+        return self.open_paren + super().__str__() + self.close_paren
 
 class Vector(List_variant):
+    open_paren = '['
+    close_paren = ']'
     def __init__(self, *args):
         super().__init__(*args)
 
+    def __str__(self):
+        return self.open_paren + super().__str__() + self.close_paren
+
 class Hash_map(List_variant):
+    open_paren = '{'
+    close_paren = '}'
     def __init__(self, *args):
         super().__init__(*args)
+
+    def __str__(self):
+        return self.open_paren + super().__str__() + self.close_paren
