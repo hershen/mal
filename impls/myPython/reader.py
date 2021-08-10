@@ -111,17 +111,18 @@ def read_list(reader):
         mal_list_variant = mal_types.Vector()
     elif open_paren == '{':
         mal_list_variant = mal_types.Hash_map()
+
     while True:
         mal_object = read_form(reader)
-        is_string = isinstance(mal_object, str)
 
-        if is_string and mal_object == '': #reached reader end
+        if mal_object == '': #reached reader end
             raise ValueError(f'unbalanced "{mal_list_variant.open_paren}"')
 
-        if is_string and mal_object in mal_types.closing_paren_style.values():
+        if mal_object in mal_types.closing_paren_style.values():
             break
 
         mal_list_variant.append(mal_object)
+
     return mal_list_variant
 
 slash_preceded_charecters = ['\\', '"']
@@ -147,6 +148,10 @@ def remove_escape_backslash(input_string):
 
 
 def read_atom(reader):
+    """
+    Returns mal_type
+    """
+
     token = reader.next()
     if token[0].isdigit() or (len(token)>2 and token[0] == '-' and token[1].isdigit()):
         return mal_types.Int(token)
@@ -156,7 +161,7 @@ def read_atom(reader):
         return mal_types.String(output_string)
 
     else:
-        return token
+        return mal_types.Symbol(token)
 
 def read_str(line):
     tokens = tokenize(line)

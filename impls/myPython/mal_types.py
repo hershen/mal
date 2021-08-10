@@ -10,6 +10,16 @@ class String(str):
     def __init__(self, *args):
         str.__init__(*args)
 
+class Symbol():
+    def __init__(self, string=''):
+        self.string = string
+
+    def __str__(self):
+        return self.string
+
+    def __eq__(self, other):
+        return self.string == other
+
 class List_variant(list):
     def __init__(self, *args):
         list.__init__(self, *args)
