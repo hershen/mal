@@ -70,22 +70,36 @@ quote_symbol_to_word = {"'":  'quote',
                         '~@': 'splice-unquote',
                         '@':  'deref'
                         }
+
+def is_list_type(token):
+    return token[0] in mal_types.closing_paren_style.keys()
+
+def read_quote(reader):
+    quote_symbol = reader.next()
+    return mal_types.List([quote_symbol_to_word[quote_symbol], read_form(reader)])
+
+def read_with_meta(reader):
+    carrot_symbol = reader.next()
+    first_arg = read_form(reader)
+    second_arg = read_form(reader)
+    return mal_types.List(['with-meta', second_arg, first_arg])
+
 def read_form(reader):
+    """"
+    Peek at next token and returns mal_type.
+    """
+
     if reader.empty():
-        return ''
+        return mal_types.String('')
 
     next_token = reader.peek()
     
-    if next_token[0] in mal_types.closing_paren_style.keys():
+    if is_list_type(next_token):
         return read_list(reader)
     elif next_token in quote_symbol_to_word.keys():
-        quote_symbol = reader.next() #advance reader
-        return mal_types.List([quote_symbol_to_word[quote_symbol], read_form(reader)])
+        return read_quote(reader)
     elif next_token == '^':
-        reader.next()
-        first_arg = read_form(reader)
-        second_arg = read_form(reader)
-        return mal_types.List(['with-meta', second_arg, first_arg])
+        return read_with_meta(reader)
     else:
         return read_atom(reader)
 
