@@ -109,7 +109,7 @@ if __name__ == "__main__":
         try: 
             line = input('user> ')
             rep_line = rep(line)
-            print(str(rep_line))
+            print(repr(rep_line))
         except ValueError as e:
             print(e)
         except UnrecognizedSymbol as e:

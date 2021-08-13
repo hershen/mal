@@ -113,10 +113,10 @@ def read_list(reader):
         mal_list_variant = mal_types.Hash_map()
 
     while True:
-        mal_object = read_form(reader)
-
-        if isinstance(mal_object, str) and mal_object == '': #reached reader end
+        if reader.empty():
             raise ValueError(f'unbalanced "{mal_list_variant.open_paren}"')
+
+        mal_object = read_form(reader)
 
         if mal_object in mal_types.closing_paren_style.values():
             break
