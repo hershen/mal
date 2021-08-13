@@ -115,7 +115,7 @@ def read_list(reader):
     while True:
         mal_object = read_form(reader)
 
-        if mal_object == '': #reached reader end
+        if isinstance(mal_object, str) and mal_object == '': #reached reader end
             raise ValueError(f'unbalanced "{mal_list_variant.open_paren}"')
 
         if mal_object in mal_types.closing_paren_style.values():
@@ -135,6 +135,9 @@ def remove_escape_backslash(input_string):
             next_char = next(iterator, None)
             if next_char in slash_preceded_charecters:
                 char = next_char #skip the '\' character
+            elif next_char == 'n':
+                output_string += chr(10)
+                char = next_char = ''
             else: # "undo" advancing the iterator
                 output_string += char
                 char = next_char
@@ -156,8 +159,16 @@ def read_atom(reader):
         return mal_types.Int(token)
 
     elif token[0] == '"':
-        output_string = '"' + remove_escape_backslash(token[1:-1]) + '"'
-        return mal_types.String(output_string)
+        return mal_types.String(remove_escape_backslash(token[1:-1]))
+    
+    elif token == 'nil':
+        return mal_types.Nil()
+
+    elif token == 'true':
+        return mal_types.true()
+    
+    elif token == 'false':
+        return mal_types.false()
 
     else:
         return mal_types.Symbol(token)
