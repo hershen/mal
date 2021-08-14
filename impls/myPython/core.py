@@ -2,6 +2,7 @@ import operator
 
 import mal_types
 import printer
+import reader
 
 def prn(*x):
     try:
@@ -32,6 +33,10 @@ def println(*items):
     print(joined_string)
     return mal_types.Nil()
 
+def slurp(string):
+    with open(str(string), 'r') as f:
+        return mal_types.String(f.read())
+
 ns = {mal_types.Symbol('+'): operator.add,
       mal_types.Symbol('-'): operator.sub,
       mal_types.Symbol('*'): operator.mul,
@@ -51,5 +56,8 @@ ns = {mal_types.Symbol('+'): operator.add,
       mal_types.Symbol('pr-str'): lambda *x: prstr(*x),
       mal_types.Symbol('str'): lambda *x: str_function(*x),
       mal_types.Symbol('prn'): lambda *x: prn(*x),
-      mal_types.Symbol('println'): lambda *x: println(*x)
+      mal_types.Symbol('println'): lambda *x: println(*x),
+    
+      mal_types.Symbol('read-string'): lambda x: reader.read_str(str(x)),
+      mal_types.Symbol('slurp'): lambda x: slurp(x)
       }
