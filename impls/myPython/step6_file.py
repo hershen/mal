@@ -24,7 +24,7 @@ class UnrecognizedSymbol(Exception):
 class UnrecognizedSymbol(Exception):
     pass
 
-class FnState:
+class FunctionState:
     def __init__(self, mal_type, params, env, fn):
         self.mal_type = mal_type
         self.params = params
@@ -102,14 +102,14 @@ def EVAL(mal_type, environment):
                 params = mal_type[1]
                 body = mal_type[2]
                 fn = closure
-                return FnState(body, params, environment, fn)
+                return FunctionState(body, params, environment, fn)
 
             else: # "regular" list
                 evaluated_list = eval_ast(mal_type, environment)
                 function = evaluated_list[0]
                 operands = evaluated_list[1:]
 
-                if isinstance(function, FnState):
+                if isinstance(function, FunctionState):
                     mal_type = function.mal_type
                     environment = env.Env(outer = function.env, binds = function.params, exprs = operands)
                 else:
