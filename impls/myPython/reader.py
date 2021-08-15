@@ -70,6 +70,8 @@ quote_symbol_to_word = {"'":  'quote',
                         '~@': 'splice-unquote',
                         '@':  'deref'
                         }
+def remove_new_lines(tokens):
+    return [token.rstrip() for token in tokens]
 
 def is_list_type(token):
     return token[0] in mal_types.closing_paren_style.keys()
@@ -175,6 +177,7 @@ def read_atom(reader):
 
 def read_str(line):
     tokens = tokenize(line)
+    tokens = remove_new_lines(tokens)
     reader = Reader(tokens)
     return read_form(reader)
 
