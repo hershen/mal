@@ -2,6 +2,19 @@ closing_paren_style = {'(': ')',
                        '[': ']',
                        '{': '}'}
 
+class Atom:
+    def __init__(self, mal_value):
+        self.mal_value = mal_value
+
+    def __repr__(self):
+        return f'(atom {self.get()})'
+
+    def get(self):
+        return self.mal_value
+
+    def set(self, mal_value):
+        self.mal_value = mal_value
+
 class Nil:
     def __repr__(self):
         return "nil"

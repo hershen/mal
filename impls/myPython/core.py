@@ -41,6 +41,14 @@ def slurp(string):
         error_string = f'Could not open file {string}'
         raise FileNotFoundError(error_string)
 
+def reset(atom, mal_value):
+    atom.set(mal_value)
+    return mal_value
+
+def swap(atom, function, *args):
+    atom.set(function(atom.get(), *args))
+    return atom.get()
+
 ns = {mal_types.Symbol('+'): operator.add,
       mal_types.Symbol('-'): operator.sub,
       mal_types.Symbol('*'): operator.mul,
@@ -63,5 +71,13 @@ ns = {mal_types.Symbol('+'): operator.add,
       mal_types.Symbol('println'): lambda *x: println(*x),
     
       mal_types.Symbol('read-string'): lambda x: reader.read_str(str(x)),
-      mal_types.Symbol('slurp'): lambda x: slurp(x)
+      mal_types.Symbol('slurp'): lambda x: slurp(x),
+
+      mal_types.Symbol('atom'): lambda x: mal_types.Atom(x),
+      mal_types.Symbol('atom?'): lambda x: true_false(isinstance(x, mal_types.Atom)),
+      mal_types.Symbol('deref'): lambda x: x.get(),
+      mal_types.Symbol('reset!'): lambda atom, mal_value: reset(atom, mal_value),
+      # mal_types.Symbol('swap!'): lambda atom, function, *args: swap(atom, function, *args)
+      mal_types.Symbol('swap!'): lambda atom, function, *args: swap(atom, function, *args)
+
       }
