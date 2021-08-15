@@ -145,7 +145,8 @@ if __name__ == "__main__":
             print(e)
         except EOFError:
             #EOF
+            print()
             break
         except KeyboardInterrupt: #Ctrl-C
-            break
+            print()
 
