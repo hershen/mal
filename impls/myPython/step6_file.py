@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import readline
+import sys
 
 import env
 import mal_types
@@ -131,12 +132,30 @@ def rep(line):
     printed = PRINT(evaluated)
     return printed
 
+def set_argv():
+    """
+    Add command line arguments. If none are given, add empty list
+    """
+    try:
+        args = mal_types.List([mal_types.String(arg) for arg in sys.argv[2:]])
+    except IndexError:
+        args = mal_types.List([])
+
+    repl_env.set('*ARGV*', args)
+
 if __name__ == "__main__":
     #Define not symbol
     rep("(def! not (fn* (a) (if a false true)))")
 
     #Define load-file
     rep('(def! load-file (fn* (f) (eval (read-string (str "(do " (slurp f) "\nnil)")))))')
+
+    set_argv()
+
+    if len(sys.argv) > 1:
+        filename = sys.argv[1]
+        rep(f'(load-file "{filename}")')
+        exit()
 
     while True:
         try: 
