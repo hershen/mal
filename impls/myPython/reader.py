@@ -37,7 +37,11 @@ def tokenize(line, tokens=[]):
     
     # Comment
     if line[0] == ';':
-        return tokenize('', tokens + [line])
+        EOF_index = line.find(chr(10))
+        if EOF_index == -1: # No end of line, ignore all rest of line
+            return tokenize('', tokens + [line])
+        else:
+            return tokenize(line[EOF_index:], tokens) #ignore current comment
 
     # Double quotes
     if line[0] == '"':
@@ -64,14 +68,15 @@ def tokenize(line, tokens=[]):
 
         return tokenize(line[first_end_sequence_char_index:], tokens + [line[:first_end_sequence_char_index]])
 
-quote_symbol_to_word = {"'":  'quote',
-                        '`':  'quasiquote',
-                        '~':  'unquote',
-                        '~@': 'splice-unquote',
-                        '@':  'deref'
-                        }
 def remove_new_lines(tokens):
     return [token.rstrip() for token in tokens]
+
+quote_symbol_to_word = {"'":  mal_types.Symbol('quote'),
+                        '`':  mal_types.Symbol('quasiquote'),
+                        '~':  mal_types.Symbol('unquote'),
+                        '~@': mal_types.Symbol('splice-unquote'),
+                        '@':  mal_types.Symbol('deref')
+                        }
 
 def is_list_type(token):
     return token[0] in mal_types.closing_paren_style.keys()
@@ -107,6 +112,7 @@ def read_form(reader):
 
 def read_list(reader):
     open_paren = reader.next() # This should be the opening paren type ( [ {
+
     if open_paren == '(':
         mal_list_variant = mal_types.List()
     elif open_paren == '[':
