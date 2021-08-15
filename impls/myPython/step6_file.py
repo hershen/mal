@@ -31,6 +31,10 @@ class FunctionState:
         self.env = env
         self.fn = fn
 
+    def __call__(self, *args):
+        return self.fn(*args)
+
+
 def eval_ast(mal_type, environment):
     if isinstance(mal_type, mal_types.Symbol):
         try:
