@@ -34,8 +34,12 @@ def println(*items):
     return mal_types.Nil()
 
 def slurp(string):
-    with open(str(string), 'r') as f:
-        return mal_types.String(f.read())
+    try:
+        with open(str(string), 'r') as f:
+            return mal_types.String(f.read())
+    except FileNotFoundError:
+        error_string = f'Could not open file {string}'
+        raise FileNotFoundError(error_string)
 
 ns = {mal_types.Symbol('+'): operator.add,
       mal_types.Symbol('-'): operator.sub,

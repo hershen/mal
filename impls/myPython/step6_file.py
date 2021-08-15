@@ -149,4 +149,6 @@ if __name__ == "__main__":
             break
         except KeyboardInterrupt: #Ctrl-C
             print()
+        except FileNotFoundError as e:
+            print(e)
 
