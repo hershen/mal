@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 
+import readline
+
 import env
 import mal_types
 import core
