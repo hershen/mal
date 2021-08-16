@@ -45,7 +45,11 @@ class Int(int):
 
 class String():
     def __eq__(self, other):
-        return self.string == other
+        if isinstance(other, String):
+            return self.string == other.string
+        elif isinstance(other, str):
+            return self.string == other
+        return False
 
     def __init__(self, *args):
         self.string = str(*args)
@@ -68,7 +72,11 @@ class Symbol():
         return self.string
 
     def __eq__(self, other):
-        return self.string == other
+        if isinstance(other, Symbol):
+            return self.string == other
+        elif isinstance(other, str):
+            return self.string == other
+        return False
 
     def __hash__(self):
         return hash(self.string)

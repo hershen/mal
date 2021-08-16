@@ -55,6 +55,24 @@ def concat(*lists):
         new_list.extend(l)
     return mal_types.List(new_list)
 
+def quasiquote(mal_type):
+    if isinstance(mal_type, mal_types.List):
+        try:
+            if len(mal_type) > 1 and mal_type[0] == 'unquote':
+                return mal_type[1]
+        except IndexError:
+            raise ValueError(f'Cannot quasiquote on List {mal_type}')
+
+        if len(mal_type)==0:
+            return mal_type
+        if isinstance(mal_type[0], mal_types.List) and len(mal_type[0])>1 and mal_type[0][0] == 'splice-unquote':
+            first_element_of_splice = mal_type[0][1]
+            return mal_types.List([mal_types.Symbol('concat'), first_element_of_splice, quasiquote(mal_type[1:])])
+        return mal_types.List([mal_types.Symbol('cons'), quasiquote(mal_type[0]), quasiquote(mal_type[1:])])
+    if isinstance(mal_type, mal_types.Symbol) or isinstance(mal_type, mal_types.Hash_map):
+        return mal_types.List([mal_types.Symbol('quote'), mal_type])
+    return mal_type
+
 ns = {mal_types.Symbol('+'): operator.add,
       mal_types.Symbol('-'): operator.sub,
       mal_types.Symbol('*'): operator.mul,

@@ -30,6 +30,10 @@ class FunctionState:
 
 
 def eval_ast(mal_type, environment):
+    """
+    Evaluate each element of the ast (mal_type).
+    If it's a List type, evaluate each element of the list.
+    """
     if isinstance(mal_type, mal_types.Symbol):
         try:
             return environment.get(mal_type)
@@ -101,6 +105,17 @@ def EVAL(mal_type, environment):
                 body = mal_type[2]
                 fn = closure
                 return FunctionState(body, params, environment, fn)
+        
+            elif operation_type == 'quote':
+                # print(mal_type, mal_type[1], type(mal_type[1]))
+                return mal_type[1]
+
+            elif operation_type == 'quasiquoteexpand': # Supposed to be used for debugging - in practice used to pass all tests
+                return core.quasiquote(mal_type[1])
+
+            elif operation_type == 'quasiquote':
+                quasiquote_returned = core.quasiquote(mal_type[1])
+                mal_type = quasiquote_returned #evaluate value returned by quasiquote by tail call optimation in next while iteration
 
             else: # "regular" list
                 evaluated_list = eval_ast(mal_type, environment)
@@ -142,7 +157,6 @@ def define_new_forms():
 
     #Define load-file
     rep('(def! load-file (fn* (f) (eval (read-string (str "(do " (slurp f) "\nnil)")))))')
-
 
     #eval functionality
     def mal_eval(mal_type):
