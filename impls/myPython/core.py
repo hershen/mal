@@ -55,10 +55,10 @@ def concat(*lists):
         new_list.extend(l)
     return mal_types.List(new_list)
 
-def quasiquote(mal_type):
+def quasiquote(mal_type, ignore_unquote=False):
     if isinstance(mal_type, mal_types.List):
         try:
-            if len(mal_type) > 1 and mal_type[0] == 'unquote':
+            if len(mal_type) > 1 and mal_type[0] == 'unquote' and not ignore_unquote:
                 return mal_type[1]
         except IndexError:
             raise ValueError(f'Cannot quasiquote on List {mal_type}')
@@ -69,6 +69,11 @@ def quasiquote(mal_type):
             first_element_of_splice = mal_type[0][1]
             return mal_types.List([mal_types.Symbol('concat'), first_element_of_splice, quasiquote(mal_type[1:])])
         return mal_types.List([mal_types.Symbol('cons'), quasiquote(mal_type[0]), quasiquote(mal_type[1:])])
+
+    if isinstance(mal_type, mal_types.Vector):
+        new_list = mal_types.List(mal_type.list)
+        return mal_types.List([mal_types.Symbol('vec'), quasiquote(new_list, ignore_unquote=True)])
+
     if isinstance(mal_type, mal_types.Symbol) or isinstance(mal_type, mal_types.Hash_map):
         return mal_types.List([mal_types.Symbol('quote'), mal_type])
     return mal_type
@@ -105,5 +110,6 @@ ns = {mal_types.Symbol('+'): operator.add,
       mal_types.Symbol('swap!'): lambda atom, function, *args: swap(atom, function, *args),
 
       mal_types.Symbol('cons'): lambda new_element, original_list: mal_types.List([new_element] + original_list.list),
-      mal_types.Symbol('concat'): lambda *lists: concat(*lists)
+      mal_types.Symbol('concat'): lambda *lists: concat(*lists),
+      mal_types.Symbol('vec'): lambda vector: mal_types.Vector(vector.list)
       }
