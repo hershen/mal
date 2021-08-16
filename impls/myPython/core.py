@@ -49,6 +49,12 @@ def swap(atom, function, *args):
     atom.set(function(atom.get(), *args))
     return atom.get()
 
+def concat(*lists):
+    new_list = []
+    for l in lists:
+        new_list.extend(l)
+    return mal_types.List(new_list)
+
 ns = {mal_types.Symbol('+'): operator.add,
       mal_types.Symbol('-'): operator.sub,
       mal_types.Symbol('*'): operator.mul,
@@ -78,6 +84,8 @@ ns = {mal_types.Symbol('+'): operator.add,
       mal_types.Symbol('deref'): lambda x: x.get(),
       mal_types.Symbol('reset!'): lambda atom, mal_value: reset(atom, mal_value),
       # mal_types.Symbol('swap!'): lambda atom, function, *args: swap(atom, function, *args)
-      mal_types.Symbol('swap!'): lambda atom, function, *args: swap(atom, function, *args)
+      mal_types.Symbol('swap!'): lambda atom, function, *args: swap(atom, function, *args),
 
+      mal_types.Symbol('cons'): lambda new_element, original_list: mal_types.List([new_element] + original_list.list),
+      mal_types.Symbol('concat'): lambda *lists: concat(*lists)
       }
