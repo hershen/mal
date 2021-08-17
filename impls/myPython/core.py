@@ -4,6 +4,9 @@ import mal_types
 import printer
 import reader
 
+class IndexOutOfBounds(Exception):
+    pass
+
 def prn(*x):
     try:
         print(printer.pr_str(x[0], print_readably=True))
@@ -78,6 +81,28 @@ def quasiquote(mal_type, ignore_unquote=False):
         return mal_types.List([mal_types.Symbol('quote'), mal_type])
     return mal_type
 
+def nth(list_type, index):
+    try:
+        return list_type[index]
+    except IndexError:
+        raise IndexOutOfBounds(f'List type {list_type} does not have an element at index {index}')
+
+def first(list_type):
+    try:
+        return list_type[0]
+    except IndexError:
+        return mal_types.Nil()
+    except TypeError:
+        return mal_types.Nil()
+
+def rest(list_type):
+    try:
+        return mal_types.List(list_type[1:])
+    except IndexError:
+        return mal_types.List()
+    except TypeError:
+        return mal_types.List()
+
 ns = {mal_types.Symbol('+'): operator.add,
       mal_types.Symbol('-'): operator.sub,
       mal_types.Symbol('*'): operator.mul,
@@ -106,10 +131,13 @@ ns = {mal_types.Symbol('+'): operator.add,
       mal_types.Symbol('atom?'): lambda x: true_false(isinstance(x, mal_types.Atom)),
       mal_types.Symbol('deref'): lambda x: x.get(),
       mal_types.Symbol('reset!'): lambda atom, mal_value: reset(atom, mal_value),
-      # mal_types.Symbol('swap!'): lambda atom, function, *args: swap(atom, function, *args)
       mal_types.Symbol('swap!'): lambda atom, function, *args: swap(atom, function, *args),
 
       mal_types.Symbol('cons'): lambda new_element, original_list: mal_types.List([new_element] + original_list.list),
       mal_types.Symbol('concat'): lambda *lists: concat(*lists),
-      mal_types.Symbol('vec'): lambda vector: mal_types.Vector(vector.list)
+      mal_types.Symbol('vec'): lambda vector: mal_types.Vector(vector.list),
+      mal_types.Symbol('nth'): lambda list_type, index: nth(list_type, index),
+      mal_types.Symbol('first'): lambda list_type: first(list_type),
+      mal_types.Symbol('rest'): lambda list_type: rest(list_type)
+
       }

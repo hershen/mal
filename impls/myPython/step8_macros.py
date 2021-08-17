@@ -9,14 +9,10 @@ import core
 import reader
 import printer
 
+class UnrecognizedSymbol(Exception):
+    pass
 
 repl_env = env.Env(mal_types.Nil())
-
-class UnrecognizedSymbol(Exception):
-    pass
-
-class UnrecognizedSymbol(Exception):
-    pass
 
 def eval_ast(mal_type, environment):
     """
@@ -188,6 +184,8 @@ def define_new_forms():
         return EVAL(mal_type, repl_env)
     repl_env.set('eval', mal_eval)
 
+    rep('(defmacro! cond (fn* (& xs) (if (> (count xs) 0) (list \'if (first xs) (if (> (count xs) 1) (nth xs 1) (throw \"odd number of forms to cond\")) (cons \'cond (rest (rest xs)))))))')
+
 if __name__ == "__main__":
 
     define_new_forms()
@@ -219,5 +217,7 @@ if __name__ == "__main__":
         except KeyboardInterrupt: #Ctrl-C
             print()
         except FileNotFoundError as e:
+            print(e)
+        except core.IndexOutOfBounds as e:
             print(e)
 
