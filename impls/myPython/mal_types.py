@@ -32,12 +32,18 @@ class true:
     def __eq__(self, other):
         return isinstance(other, true)
 
+    def __bool__(self):
+        return True
+
 class false:
     def __repr__(self):
         return 'false'
 
     def __eq__(self, other):
         return isinstance(other, false)
+
+    def __bool__(self):
+        return False
 
 class Int(int):
     def __new__(cls, value):
