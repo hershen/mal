@@ -7,10 +7,16 @@
 | `quote` | A mal type. | The mal type. If the mal type is not defined, treats it like a Symbol and returns the name of the Symbol. | `(quote abc)` -> `abc` |
 | `quasiquote` | A mal type. | The same as `quote`, unless mal type is a list starting with `unquote` or `splice-unquote`. These are detailed below. | `(quasiquote abc)` -> `abc`  |
 | `unquote` | A mal type. | Meant to be used inside a `quasiquote` evaluation. Replaces the call to itself with the evaluated form of the argument. | `(def! lst (quote (b c)))` -> `(b c)`, `(quasiquote (a (unquote lst) d))` -> `(a (b c) d)` |
-| `splice-unquote` | A List | Meant to be used inside a `quasiquote` evaluation. Replaces the call to itself with the contents of the List. | `(def! lst (quote (b c)))` -> `(b c)`, `(quasiquote (a (splice-unquote lst) d))` -> `(a b c d)` |
-| `vec` | A List or a Vector | A vector with the same elements as in the input. | `(vec (list 1 2))` -> `[1 2]` |
+| `splice-unquote` | A List. | Meant to be used inside a `quasiquote` evaluation. Replaces the call to itself with the contents of the List. | `(def! lst (quote (b c)))` -> `(b c)`, `(quasiquote (a (splice-unquote lst) d))` -> `(a b c d)` |
+| `vec` | A List or a Vector. | A vector with the same elements as in the input. | `(vec (list 1 2))` -> `[1 2]` |
+| `defmacro` | | Not clear how different from `def!`. In all the expamples I checked, they preform the same. | |
+| `nth` | A List or Vector and an index number. | The element in the List or Vector at position index. | `(nth (list 1 2) 1)` -> `2` |
+| `first` | A List or Vector. | The first element in the List or Vector. If the List or Vectors are empty, or are Nil, Nil is returned. | `(first (list 7 8 9))` -> `7`, `(first nil)` -> `nil` |
+| `rest` | A List or Vector. | A new List containing all the elements of the List or Vector, excpet the first. If the List or Vectors are empty, or are Nil, an empty List is returned. | `(rest (list 7 8 9))` -> `(8 9)`, `(rest nil)` -> `()` |
+| `cond` | A List containing an even number of elements. | The elements are treated in pairs. The first element of a pair is a condition. The second is a value. `cond` returns the first value for which the condition is true. | `(cond false 7 (= 2 2) 8 "else" 9)` -> `8`, `(cond false 7 (= 2 5) 8 "else" 9)` -> `9` |
 
-# Reader macros
+
+# Reader macro
 
 | Function | Explanatoin | Example |
 |  ---     | ---         | ---     |
