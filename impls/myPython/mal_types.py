@@ -153,7 +153,7 @@ class Hash_map(List_variant):
         return self.open_paren + super().__repr__() + self.close_paren
 
 class FunctionState:
-    def __init__(self, mal_type, params, env, fn, is_macro=false):
+    def __init__(self, mal_type, params, env, fn, is_macro=false()):
         self.mal_type = mal_type
         self.params = params
         self.env = env
