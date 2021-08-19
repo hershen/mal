@@ -138,6 +138,20 @@ ns = {mal_types.Symbol('+'): operator.add,
       mal_types.Symbol('vec'): lambda vector: mal_types.Vector(vector.list),
       mal_types.Symbol('nth'): lambda list_type, index: nth(list_type, index),
       mal_types.Symbol('first'): lambda list_type: first(list_type),
-      mal_types.Symbol('rest'): lambda list_type: rest(list_type)
+      mal_types.Symbol('rest'): lambda list_type: rest(list_type),
 
+      mal_types.Symbol('apply'): lambda function, *args: function(*args[:-1], *args[-1]),
+      mal_types.Symbol('map'): lambda function, list_type: mal_types.List([function(item) for item in list_type]),
+      mal_types.Symbol('nil?'): lambda mal_type: true_false(isinstance(mal_type, mal_types.Nil)),
+      mal_types.Symbol('true?'): lambda mal_type: true_false(isinstance(mal_type, mal_types.true)),
+      mal_types.Symbol('false?'): lambda mal_type: true_false(isinstance(mal_type, mal_types.false)),
+      mal_types.Symbol('symbol?'): lambda mal_type: true_false(isinstance(mal_type, mal_types.Symbol)),
+      mal_types.Symbol('vector?'): lambda mal_type: true_false(isinstance(mal_type, mal_types.Vector)),
+      mal_types.Symbol('map?'): lambda mal_type: true_false(isinstance(mal_type, mal_types.Hash_map)),
+      mal_types.Symbol('sequential?'): lambda mal_type: true_false(isinstance(mal_type, mal_types.List) or isinstance(mal_type, mal_types.Vector)),
+
+      mal_types.Symbol('symbol'): lambda mal_type: mal_types.Symbol(mal_type.string),
+      mal_types.Symbol('vector'): lambda *args: mal_types.Vector(args),
+      mal_types.Symbol('hash-map'): lambda *args: mal_types.Hash_map(args),
+      mal_types.Symbol('assoc'): lambda hash_map, *args: mal_types.Hash_map(hash_map.list + list(args))
       }

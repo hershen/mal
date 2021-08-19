@@ -138,6 +138,9 @@ class Vector(List_variant):
     def __repr__(self):
         return self.open_paren + super().__repr__() + self.close_paren
 
+    def index(self, index):
+        return self.list.index(index)
+
 class Hash_map(List_variant):
     open_paren = '{'
     close_paren = '}'
