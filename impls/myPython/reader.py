@@ -19,7 +19,7 @@ class Reader():
     def empty(self):
         return self.current_index >= len(self.tokens)
 
-def tokenize(line, tokens=[]):
+def tokenize(line, tokens):
     line = line.lstrip(' \t\n\r,')
 
     if len(line) == 0:
@@ -185,7 +185,7 @@ def read_atom(reader):
         return mal_types.Symbol(token)
 
 def read_str(line):
-    tokens = tokenize(line)
+    tokens = tokenize(line, [])
     tokens = remove_new_lines(tokens)
     reader = Reader(tokens)
     return read_form(reader)
