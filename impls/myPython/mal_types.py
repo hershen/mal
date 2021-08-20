@@ -107,6 +107,13 @@ class List_variant():
     def __eq__(self, other):
         return self.list == other
 
+class Keyword():
+    def __init__(self, string):
+        self.string = string
+
+    def __repr__(self):
+        return self.string
+
 class List(List_variant):
     open_paren = '('
     close_paren = ')'

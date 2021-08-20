@@ -169,6 +169,9 @@ def read_atom(reader):
     elif token[0] == '"':
         return mal_types.String(remove_escape_backslash(token[1:-1]))
     
+    elif token[0] == ':':
+        return mal_types.Keyword(token)
+    
     elif token == 'nil':
         return mal_types.Nil()
 

@@ -103,6 +103,12 @@ def rest(list_type):
     except TypeError:
         return mal_types.List()
 
+def make_keyword(value):
+    if isinstance(value, mal_types.Keyword):
+        return value
+
+    return mal_types.Keyword( ':' + value.string)
+
 ns = {mal_types.Symbol('+'): operator.add,
       mal_types.Symbol('-'): operator.sub,
       mal_types.Symbol('*'): operator.mul,
@@ -145,6 +151,7 @@ ns = {mal_types.Symbol('+'): operator.add,
       mal_types.Symbol('nil?'): lambda mal_type: true_false(isinstance(mal_type, mal_types.Nil)),
       mal_types.Symbol('true?'): lambda mal_type: true_false(isinstance(mal_type, mal_types.true)),
       mal_types.Symbol('false?'): lambda mal_type: true_false(isinstance(mal_type, mal_types.false)),
+      mal_types.Symbol('keyword?'): lambda mal_type: true_false(isinstance(mal_type, mal_types.Keyword)),
       mal_types.Symbol('symbol?'): lambda mal_type: true_false(isinstance(mal_type, mal_types.Symbol)),
       mal_types.Symbol('vector?'): lambda mal_type: true_false(isinstance(mal_type, mal_types.Vector)),
       mal_types.Symbol('map?'): lambda mal_type: true_false(isinstance(mal_type, mal_types.Hash_map)),
@@ -152,6 +159,7 @@ ns = {mal_types.Symbol('+'): operator.add,
 
       mal_types.Symbol('symbol'): lambda mal_type: mal_types.Symbol(mal_type.string),
       mal_types.Symbol('vector'): lambda *args: mal_types.Vector(args),
+      mal_types.Symbol('keyword'): lambda string: make_keyword(string),
       mal_types.Symbol('hash-map'): lambda *args: mal_types.Hash_map(args),
       mal_types.Symbol('assoc'): lambda hash_map, *args: mal_types.Hash_map(hash_map.list + list(args))
       }
