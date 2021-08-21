@@ -73,6 +73,23 @@ def EVAL(mal_type, environment):
                 return eval_ast(mal_type, environment)
 
             operation_type = mal_type[0]
+
+            if operation_type == 'try*':
+                try:
+                    return EVAL(mal_type[1], environment)
+                except Exception as exception:
+                    try:
+                        catch_block = mal_type[2]
+                    except IndexError:
+                            raise env.MissingKeyInEnvironment(f'{mal_type[1]} not found')
+
+                    bind = catch_block[1]
+                    exception_value = exception.value if isinstance(exception, mal_types.MalException) else exception
+                    new_environment = env.Env(outer=environment, binds=[bind], exprs=[exception_value])
+
+                    new_eval = catch_block[2]
+                    return EVAL(new_eval, new_environment)
+
             if operation_type == 'def!':
                 key = mal_type[1]
                 value = EVAL(mal_type[2], environment)
@@ -219,5 +236,7 @@ if __name__ == "__main__":
         except FileNotFoundError as e:
             print(e)
         except core.IndexOutOfBounds as e:
+            print(e)
+        except mal_types.MalException as e:
             print(e)
 

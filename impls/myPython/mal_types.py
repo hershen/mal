@@ -2,6 +2,17 @@ closing_paren_style = {'(': ')',
                        '[': ']',
                        '{': '}'}
 
+
+class MalException(Exception):
+    def __init__(self, value):
+        self.value = value
+
+    def __str__(self):
+        if isinstance(self.value, String) or isinstance(self.value, Hash_map):
+            return f'Exception {repr(self.value)}'
+
+        return repr(self.value)
+
 class Atom:
     def __init__(self, mal_value):
         self.mal_value = mal_value
@@ -108,11 +119,18 @@ class List_variant():
         return self.list == other
 
 class Keyword():
+    def __eq__(self, other):
+        return isinstance(other, Keyword) and self.string == other.string
+
+    def __hash__(self):
+        return hash(self.string)
+
     def __init__(self, string):
         self.string = string
 
     def __repr__(self):
         return self.string
+
 
 class List(List_variant):
     open_paren = '('
@@ -121,6 +139,9 @@ class List(List_variant):
         if isinstance(indices, slice):
             return List([item for item in self.list[indices]])
         return self.list[indices]
+
+    def __hash__(self):
+        return hash(tuple(self.list))
 
     def __init__(self, *args):
         super().__init__(*args)
@@ -142,6 +163,9 @@ class Vector(List_variant):
     def __init__(self, *args):
         super().__init__(*args)
 
+    def __hash__(self):
+        return hash(tuple(self.list))
+
     def __repr__(self):
         return self.open_paren + super().__repr__() + self.close_paren
 
@@ -156,12 +180,27 @@ class Hash_map(List_variant):
             return Hash_map([item for item in self.list[indices]])
         return self.list[indices]
 
+    def __eq__(self, other):
+        return isinstance(other, Hash_map) and set(self.keys()) == set(other.keys()) and set(self.values()) == set(other.values()) 
+
+    def __hash__(self):
+        return hash(tuple(self.list))
+
     def __init__(self, *args):
         super().__init__(*args)
 
     def __repr__(self):
         return self.open_paren + super().__repr__() + self.close_paren
 
+    def items(self):
+        return List(zip(self.keys(), self.values()))
+
+    def keys(self):
+        return List(self.list[::2])
+
+    def values(self):
+        return List(self.list[1::2])
+ 
 class FunctionState:
     def __init__(self, mal_type, params, env, fn, is_macro=false()):
         self.mal_type = mal_type

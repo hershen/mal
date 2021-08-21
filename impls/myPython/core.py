@@ -109,6 +109,37 @@ def make_keyword(value):
 
     return mal_types.Keyword( ':' + value.string)
 
+def throw(err):
+    raise mal_types.MalException(err)
+
+def get(hash_map, key):
+    try:
+        return hash_map.list[hash_map.list.index(key) + 1]
+    except AttributeError: #.list throws (hash_map type doesn't have list member)
+        pass
+    except ValueError: #.index throws (key not in hash_map)
+        pass
+
+    return mal_types.Nil()
+
+def assoc(hash_map, *args):
+    """
+    Return a new Hash_map, merging new key, value pairs into hash the existing hash_map, taking care to replace new values for exciting keys.
+    """ 
+    new_list = list(args)
+    for key, value in hash_map.items():
+        if key not in new_list[::2]:
+            new_list += [key, value]
+    return mal_types.Hash_map(new_list)
+
+def dissoc(hash_map, *keys):
+    new_list = []
+    for key, value in hash_map.items():
+        if key not in keys:
+            new_list += [key, value]
+
+    return mal_types.Hash_map(new_list)
+
 ns = {mal_types.Symbol('+'): operator.add,
       mal_types.Symbol('-'): operator.sub,
       mal_types.Symbol('*'): operator.mul,
@@ -161,5 +192,13 @@ ns = {mal_types.Symbol('+'): operator.add,
       mal_types.Symbol('vector'): lambda *args: mal_types.Vector(args),
       mal_types.Symbol('keyword'): lambda string: make_keyword(string),
       mal_types.Symbol('hash-map'): lambda *args: mal_types.Hash_map(args),
-      mal_types.Symbol('assoc'): lambda hash_map, *args: mal_types.Hash_map(hash_map.list + list(args))
+      mal_types.Symbol('assoc'): lambda hash_map, *args: assoc(hash_map, *args),
+      mal_types.Symbol('dissoc'): lambda hash_map, *keys: dissoc(hash_map, *keys),
+
+      mal_types.Symbol('throw'): lambda err: throw(err),
+
+      mal_types.Symbol('get'): lambda hash_map, key: get(hash_map, key),
+      mal_types.Symbol('contains?'): lambda hash_map, key: true_false(key in hash_map.list[::2]),
+      mal_types.Symbol('keys'): lambda hash_map: hash_map.keys(),
+      mal_types.Symbol('vals'): lambda hash_map: hash_map.values()
       }
