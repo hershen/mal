@@ -18,8 +18,7 @@ def true_false(x):
     return mal_types.true() if x else mal_types.false()
 
 def prstr(*items):
-    items = [mal_types.String('"' + str(item) + '"') for item in items if isinstance(item, mal_types.String)]
-    joined_string = ' '.join([str(printer.pr_str(item, print_readably=True)) for item in items])
+    joined_string = ' '.join([printer.pr_str(item, print_readably=True) for item in items])
     return mal_types.String(joined_string)
 
 def str_function(*items):

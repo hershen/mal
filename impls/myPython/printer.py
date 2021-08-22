@@ -10,6 +10,9 @@ def pr_str(mal_type, print_readably):
         return '#<function>'
 
     if isinstance(mal_type, mal_types.String) and print_readably:
-        return add_escape_backslash(mal_type)
+        return '"' + str(add_escape_backslash(mal_type)) + '"'
 
-    return mal_type
+    elif isinstance(mal_type, mal_types.List_variant):
+        return mal_type.open_paren + ' '.join(pr_str(item, print_readably) for item in mal_type) + mal_type.close_paren
+
+    return str(mal_type)

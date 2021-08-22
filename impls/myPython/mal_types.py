@@ -76,9 +76,6 @@ class String():
             yield item
 
     def __repr__(self):
-        return '"' + str(self.string) + '"'
-
-    def __str__(self):
         return self.string
 
 class Symbol():
