@@ -19,54 +19,67 @@ class Reader():
     def empty(self):
         return self.current_index >= len(self.tokens)
 
-def tokenize(line, tokens):
-    line = line.lstrip(' \t\n\r,')
+def remove_white_spaces(line):
+    return line.lstrip(' \t\n\r,')
 
-    if len(line) == 0:
-        return tokens
+def tokenize(line):
 
-    line_len = len(line)
+    tokens = []
 
-    # ~@
-    if line[:2] == '~@':
-        return tokenize(line[2:], tokens + ['~@'])
+    line = remove_white_spaces(line)
 
-    # Special charecters
-    if line[0] in special_charecters:
-        return tokenize(line[1:], tokens + [line[0]])
+    while line:
+
+        # ~@
+        if line[:2] == '~@':
+            tokens.append('~@')
+            line = line[2:]
+
+        # Special charecters
+        elif line[0] in special_charecters:
+            tokens.append(line[0])
+            line = line[1:]
     
-    # Comment
-    if line[0] == ';':
-        EOF_index = line.find(chr(10))
-        if EOF_index == -1: # No end of line, ignore all rest of line
-            return tokenize('', tokens + [line])
-        else:
-            return tokenize(line[EOF_index:], tokens) #ignore current comment
-
-    # Double quotes
-    if line[0] == '"':
-        tmp_start_index = 1
-        while True:
-            next_double_quote_index = line.find('"', tmp_start_index)
-            if next_double_quote_index == -1:
-                raise ValueError('unbalanced "')
-
-            if line[next_double_quote_index - 1] != '\\' or line[next_double_quote_index - 2 : next_double_quote_index] == '\\\\':
-                return tokenize(line[next_double_quote_index+1:], tokens + [line[:next_double_quote_index+1]])
+        # Comment
+        elif line[0] == ';':
+            EOF_index = line.find(chr(10))
+            if EOF_index == -1: # No end of line, ignore all rest of line
+                line = ''
             else:
-                #Found \" - continue searching for closing "
-                tmp_start_index = next_double_quote_index + 1
+                line = line[EOF_index:] #ignore current comment
 
-    # Non-special charecter sequence
-    else:
-        end_sequence_chars_indices = sorted([line.find(char) for char in (special_charecters + ' \'",;') if line.find(char) != -1])
+        # Double quotes
+        elif line[0] == '"':
+            tmp_start_index = 1
+            while True:
+                next_double_quote_index = line.find('"', tmp_start_index)
+                if next_double_quote_index == -1:
+                    raise ValueError('unbalanced "')
 
-        if not end_sequence_chars_indices: # line is one long sequence
-            return tokenize('', tokens + [line])
+                if line[next_double_quote_index - 1] != '\\' or line[next_double_quote_index - 2 : next_double_quote_index] == '\\\\': # Found closing "
+                    tokens.append(line[:next_double_quote_index+1])
+                    line = line[next_double_quote_index+1:]
+                    break
+                else:
+                    #Found \" - continue searching for closing "
+                    tmp_start_index = next_double_quote_index + 1
 
-        first_end_sequence_char_index = end_sequence_chars_indices[0]
+        # Non-special charecter sequence
+        else:
+            end_sequence_chars_indices = sorted([line.find(char) for char in (special_charecters + ' \'",;') if line.find(char) != -1])
 
-        return tokenize(line[first_end_sequence_char_index:], tokens + [line[:first_end_sequence_char_index]])
+            if not end_sequence_chars_indices: # line is one long sequence
+                tokens.append(line)
+                line = ''
+
+            else:
+                first_end_sequence_char_index = end_sequence_chars_indices[0]
+                tokens.append(line[:first_end_sequence_char_index])
+                line = line[first_end_sequence_char_index:]
+
+        line = remove_white_spaces(line)
+
+    return tokens
 
 def remove_new_lines(tokens):
     return [token.rstrip() for token in tokens]
@@ -186,7 +199,7 @@ def read_atom(reader):
         return mal_types.Symbol(token)
 
 def read_str(line):
-    tokens = tokenize(line, [])
+    tokens = tokenize(line)
     tokens = remove_new_lines(tokens)
     reader = Reader(tokens)
     return read_form(reader)
