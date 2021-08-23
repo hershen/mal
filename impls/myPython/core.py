@@ -84,7 +84,7 @@ def nth(list_type, index):
     try:
         return list_type[index]
     except IndexError:
-        raise IndexOutOfBounds(f'List type {list_type} does not have an element at index {index}')
+        raise IndexOutOfBounds(f'index {index} out of range for List type {list_type}')
 
 def first(list_type):
     try:

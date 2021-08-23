@@ -21,7 +21,7 @@ class Env:
             return self
 
         if isinstance(self.outer, mal_types.Nil):
-            raise MissingKeyInEnvironment(f'{key} not found')
+            raise MissingKeyInEnvironment(f'\'{key}\' not found')
 
         return self.outer.find(key)
     
@@ -29,5 +29,5 @@ class Env:
         try:
             return self.find(key).data[key]
         except KeyError:
-            raise MissingKeyInEnvironment(f'{key} not found')
+            raise MissingKeyInEnvironment(f'\'{key}\' not found')
 
