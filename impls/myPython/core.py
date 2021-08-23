@@ -139,6 +139,9 @@ def dissoc(hash_map, *keys):
 
     return mal_types.Hash_map(new_list)
 
+def readline(string):
+    return mal_types.String(input(string))
+
 ns = {mal_types.Symbol('+'): operator.add,
       mal_types.Symbol('-'): operator.sub,
       mal_types.Symbol('*'): operator.mul,
@@ -199,5 +202,7 @@ ns = {mal_types.Symbol('+'): operator.add,
       mal_types.Symbol('get'): lambda hash_map, key: get(hash_map, key),
       mal_types.Symbol('contains?'): lambda hash_map, key: true_false(key in hash_map.list[::2]),
       mal_types.Symbol('keys'): lambda hash_map: hash_map.keys(),
-      mal_types.Symbol('vals'): lambda hash_map: hash_map.values()
+      mal_types.Symbol('vals'): lambda hash_map: hash_map.values(),
+
+      mal_types.Symbol('readline'): lambda string: readline(string)
       }
