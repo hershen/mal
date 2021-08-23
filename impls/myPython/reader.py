@@ -120,13 +120,14 @@ def read_list(reader):
     elif open_paren == '{':
         mal_list_variant = mal_types.Hash_map()
 
+    closing_paren = mal_types.closing_paren_style[open_paren]
     while True:
         if reader.empty():
             raise ValueError(f'unbalanced "{mal_list_variant.open_paren}"')
 
         mal_object = read_form(reader)
 
-        if mal_object in mal_types.closing_paren_style.values():
+        if mal_object == closing_paren:
             break
 
         mal_list_variant.append(mal_object)
