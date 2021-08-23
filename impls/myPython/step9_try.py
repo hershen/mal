@@ -84,7 +84,7 @@ def EVAL(mal_type, environment):
                             raise env.MissingKeyInEnvironment(f'{mal_type[1]} not found')
 
                     bind = catch_block[1]
-                    exception_value = exception.value if isinstance(exception, mal_types.MalException) else exception
+                    exception_value = exception.value if isinstance(exception, mal_types.MalException) else mal_types.String(str(exception))
                     new_environment = env.Env(outer=environment, binds=[bind], exprs=[exception_value])
 
                     new_eval = catch_block[2]
