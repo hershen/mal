@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import copy
+import os
 import readline
 import sys
 
@@ -9,6 +10,14 @@ import mal_types
 import core
 import reader
 import printer
+
+history_filename = os.path.join(os.path.dirname(__file__), '.history')
+history_size = 1000
+if not os.path.exists(history_filename):
+    open(history_filename, 'a').close()
+
+readline.read_history_file(history_filename)
+readline.set_history_length(history_size)
 
 class UnrecognizedSymbol(Exception):
     pass
@@ -250,3 +259,4 @@ if __name__ == "__main__":
         except mal_types.MalException as e:
             print(e)
 
+        readline.write_history_file(history_filename)
