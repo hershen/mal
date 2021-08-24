@@ -75,6 +75,9 @@ class String():
         for item in self.string:
             yield item
 
+    def __len__(self):
+        return len(self.string)
+
     def __repr__(self):
         return self.string
 
@@ -98,6 +101,7 @@ class Symbol():
 class List_variant():
     def __init__(self, *args):
         self.list = list(*args)
+        self.meta = Nil()
     
     def __iter__(self):
         for item in self.list:
@@ -205,8 +209,16 @@ class FunctionState:
         self.env = env
         self.fn = fn
         self.is_macro = is_macro
+        self.meta = Nil()
 
     def __call__(self, *args):
         return self.fn(*args)
 
+class NativeFunction:
+    def __init__(self, function):
+        self.function = function
+        self.meta = Nil()
+
+    def __call__(self, *args):
+        return Int(self.function(*args))
 

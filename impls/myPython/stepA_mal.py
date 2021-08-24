@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+import copy
 import readline
 import sys
 
@@ -99,6 +100,7 @@ def EVAL(mal_type, environment):
             if operation_type == 'defmacro!':
                 key = mal_type[1]
                 function = EVAL(mal_type[2], environment)
+                function = copy.deepcopy(function) # do not mutate orignal function
                 function.is_macro = mal_types.true()
                 environment.set(key, function)
                 return function
@@ -205,15 +207,6 @@ def define_new_forms():
 
     #host langauge
     rep('(def! *host-language* "python3")')
-
-    rep('(def! time-ms (fn* () (throw "not implemented")))')
-    rep('(def! meta (fn* () (throw "not implemented")))')
-    rep('(def! with-meta (fn* () (throw "not implemented")))')
-    rep('(def! fn? (fn* () (throw "not implemented")))')
-    rep('(def! string? (fn* () (throw "not implemented")))')
-    rep('(def! number? (fn* () (throw "not implemented")))')
-    rep('(def! seq (fn* () (throw "not implemented")))')
-    rep('(def! conj (fn* () (throw "not implemented")))')
 
 def print_startup_header():
     rep('(println (str "Mal [" *host-language* "]"))')

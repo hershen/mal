@@ -102,7 +102,7 @@ def read_with_meta(reader):
     carrot_symbol = reader.next()
     first_arg = read_form(reader)
     second_arg = read_form(reader)
-    return mal_types.List(['with-meta', second_arg, first_arg])
+    return mal_types.List([mal_types.Symbol('with-meta'), second_arg, first_arg])
 
 def read_form(reader):
     """"

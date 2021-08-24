@@ -1,4 +1,6 @@
+import copy
 import operator
+import time
 
 import mal_types
 import printer
@@ -142,10 +144,55 @@ def dissoc(hash_map, *keys):
 def readline(string):
     return mal_types.String(input(string))
 
-ns = {mal_types.Symbol('+'): operator.add,
-      mal_types.Symbol('-'): operator.sub,
-      mal_types.Symbol('*'): operator.mul,
-      mal_types.Symbol('/'): operator.truediv,
+def with_meta(mal_type, meta_data):
+    copy_of_object = copy.deepcopy(mal_type)
+    copy_of_object.meta = meta_data
+    return copy_of_object
+
+def meta(mal_type):
+    if isinstance(mal_type, mal_types.List) or \
+       isinstance(mal_type, mal_types.Vector) or \
+       isinstance(mal_type, mal_types.Hash_map) or \
+       isinstance(mal_type, mal_types.FunctionState) or \
+       isinstance(mal_type, mal_types.NativeFunction):
+           return mal_type.meta
+    return mal_types.Nil()
+
+def ismacro(mal_type):
+    if isinstance(mal_type, mal_types.FunctionState) and mal_type.is_macro:
+        return True
+    return False
+
+def isfn(mal_type):
+
+    if isinstance(mal_type, mal_types.FunctionState):
+        return not mal_type.is_macro
+
+    return callable(mal_type)
+
+def conj(mal_type, *args):
+    if isinstance(mal_type, mal_types.List):
+        return mal_types.List(list(args[::-1]) + mal_type.list)
+    elif isinstance(mal_type, mal_types.Vector):
+        return mal_types.Vector(mal_type.list + list(args))
+    
+def seq(mal_type):
+    if len(mal_type) == 0:
+        return mal_types.Nil()
+    
+    if isinstance(mal_type, mal_types.List):
+        return mal_type
+    
+    if isinstance(mal_type, mal_types.Vector): #convert Vector to List
+        return mal_types.List(mal_type.list)
+
+    if isinstance(mal_type, mal_types.String): # convert string to List of charecters
+        return mal_types.List([mal_types.String(char) for char in mal_type])
+
+ns = {mal_types.Symbol('+'): mal_types.NativeFunction(operator.add),
+      mal_types.Symbol('-'): mal_types.NativeFunction(operator.sub),
+      mal_types.Symbol('*'): mal_types.NativeFunction(operator.mul),
+      mal_types.Symbol('/'): mal_types.NativeFunction(operator.truediv),
       
       mal_types.Symbol('prn'):  lambda *x: prn(*x),
       mal_types.Symbol('list'): lambda *x: mal_types.List(x),
@@ -204,5 +251,18 @@ ns = {mal_types.Symbol('+'): operator.add,
       mal_types.Symbol('keys'): lambda hash_map: hash_map.keys(),
       mal_types.Symbol('vals'): lambda hash_map: hash_map.values(),
 
-      mal_types.Symbol('readline'): lambda string: readline(string)
+      mal_types.Symbol('readline'): lambda string: readline(string),
+
+      mal_types.Symbol('meta'): lambda mal_type: meta(mal_type),
+      mal_types.Symbol('with-meta'): lambda mal_type, meta_data: with_meta(mal_type, meta_data),
+
+      mal_types.Symbol('time-ms'): lambda : time.time()*1000,
+
+      mal_types.Symbol('string?'): lambda mal_type: true_false(isinstance(mal_type, mal_types.String)),
+      mal_types.Symbol('number?'): lambda mal_type: true_false(isinstance(mal_type, mal_types.Int)),
+      mal_types.Symbol('fn?'): lambda mal_type: true_false(isfn(mal_type)),
+      mal_types.Symbol('macro?'): lambda mal_type: true_false(ismacro(mal_type)),
+      mal_types.Symbol('conj'): lambda mal_type, *args: conj(mal_type, *args),
+      mal_types.Symbol('seq'): lambda mal_type: seq(mal_type),
+
       }
