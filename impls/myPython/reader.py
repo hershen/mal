@@ -1,8 +1,9 @@
 import mal_types
 
-special_charecters = '[]{}()\'`~^@'
+special_charecters = "[]{}()'`~^@"
 
-class Reader():
+
+class Reader:
     def __init__(self, tokens):
         self.tokens = tokens
         self.current_index = 0
@@ -19,8 +20,10 @@ class Reader():
     def empty(self):
         return self.current_index >= len(self.tokens)
 
+
 def remove_white_spaces(line):
-    return line.lstrip(' \t\n\r,')
+    return line.lstrip(" \t\n\r,")
+
 
 def tokenize(line):
 
@@ -31,22 +34,22 @@ def tokenize(line):
     while line:
 
         # ~@
-        if line[:2] == '~@':
-            tokens.append('~@')
+        if line[:2] == "~@":
+            tokens.append("~@")
             line = line[2:]
 
         # Special charecters
         elif line[0] in special_charecters:
             tokens.append(line[0])
             line = line[1:]
-    
+
         # Comment
-        elif line[0] == ';':
+        elif line[0] == ";":
             EOF_index = line.find(chr(10))
-            if EOF_index == -1: # No end of line, ignore all rest of line
-                line = ''
+            if EOF_index == -1:  # No end of line, ignore all rest of line
+                line = ""
             else:
-                line = line[EOF_index:] #ignore current comment
+                line = line[EOF_index:]  # ignore current comment
 
         # Double quotes
         elif line[0] == '"':
@@ -56,21 +59,31 @@ def tokenize(line):
                 if next_double_quote_index == -1:
                     raise ValueError('unbalanced "')
 
-                if line[next_double_quote_index - 1] != '\\' or line[next_double_quote_index - 2 : next_double_quote_index] == '\\\\': # Found closing "
-                    tokens.append(line[:next_double_quote_index+1])
-                    line = line[next_double_quote_index+1:]
+                if (
+                    line[next_double_quote_index - 1] != "\\"
+                    or line[next_double_quote_index - 2 : next_double_quote_index]
+                    == "\\\\"
+                ):  # Found closing "
+                    tokens.append(line[: next_double_quote_index + 1])
+                    line = line[next_double_quote_index + 1 :]
                     break
                 else:
-                    #Found \" - continue searching for closing "
+                    # Found \" - continue searching for closing "
                     tmp_start_index = next_double_quote_index + 1
 
         # Non-special charecter sequence
         else:
-            end_sequence_chars_indices = sorted([line.find(char) for char in (special_charecters + ' \'",;') if line.find(char) != -1])
+            end_sequence_chars_indices = sorted(
+                [
+                    line.find(char)
+                    for char in (special_charecters + " '\",;")
+                    if line.find(char) != -1
+                ]
+            )
 
-            if not end_sequence_chars_indices: # line is one long sequence
+            if not end_sequence_chars_indices:  # line is one long sequence
                 tokens.append(line)
-                line = ''
+                line = ""
 
             else:
                 first_end_sequence_char_index = end_sequence_chars_indices[0]
@@ -81,56 +94,64 @@ def tokenize(line):
 
     return tokens
 
+
 def remove_new_lines(tokens):
     return [token.rstrip() for token in tokens]
 
-quote_symbol_to_word = {"'":  mal_types.Symbol('quote'),
-                        '`':  mal_types.Symbol('quasiquote'),
-                        '~':  mal_types.Symbol('unquote'),
-                        '~@': mal_types.Symbol('splice-unquote'),
-                        '@':  mal_types.Symbol('deref')
-                        }
+
+quote_symbol_to_word = {
+    "'": mal_types.Symbol("quote"),
+    "`": mal_types.Symbol("quasiquote"),
+    "~": mal_types.Symbol("unquote"),
+    "~@": mal_types.Symbol("splice-unquote"),
+    "@": mal_types.Symbol("deref"),
+}
+
 
 def is_list_type(token):
     return token[0] in mal_types.closing_paren_style.keys()
+
 
 def read_quote(reader):
     quote_symbol = reader.next()
     return mal_types.List([quote_symbol_to_word[quote_symbol], read_form(reader)])
 
+
 def read_with_meta(reader):
     carrot_symbol = reader.next()
     first_arg = read_form(reader)
     second_arg = read_form(reader)
-    return mal_types.List([mal_types.Symbol('with-meta'), second_arg, first_arg])
+    return mal_types.List([mal_types.Symbol("with-meta"), second_arg, first_arg])
+
 
 def read_form(reader):
-    """"
+    """ "
     Peek at next token and returns mal_type.
     """
 
     if reader.empty():
-        return mal_types.String('')
+        return mal_types.String("")
 
     next_token = reader.peek()
-    
+
     if is_list_type(next_token):
         return read_list(reader)
     elif next_token in quote_symbol_to_word.keys():
         return read_quote(reader)
-    elif next_token == '^':
+    elif next_token == "^":
         return read_with_meta(reader)
     else:
         return read_atom(reader)
 
-def read_list(reader):
-    open_paren = reader.next() # This should be the opening paren type ( [ {
 
-    if open_paren == '(':
+def read_list(reader):
+    open_paren = reader.next()  # This should be the opening paren type ( [ {
+
+    if open_paren == "(":
         mal_list_variant = mal_types.List()
-    elif open_paren == '[':
+    elif open_paren == "[":
         mal_list_variant = mal_types.Vector()
-    elif open_paren == '{':
+    elif open_paren == "{":
         mal_list_variant = mal_types.Hash_map()
 
     closing_paren = mal_types.closing_paren_style[open_paren]
@@ -147,29 +168,31 @@ def read_list(reader):
 
     return mal_list_variant
 
-slash_preceded_charecters = ['\\', '"']
+
+slash_preceded_charecters = ["\\", '"']
+
 
 def remove_escape_backslash(input_string):
-    output_string = ''
+    output_string = ""
     iterator = iter(input_string)
     for char in iterator:
-        if char == '\\':
+        if char == "\\":
             next_char = next(iterator, None)
             if next_char in slash_preceded_charecters:
-                char = next_char #skip the '\' character
-            elif next_char == 'n':
+                char = next_char  # skip the '\' character
+            elif next_char == "n":
                 output_string += chr(10)
-                char = next_char = ''
-            else: # "undo" advancing the iterator
+                char = next_char = ""
+            else:  # "undo" advancing the iterator
                 output_string += char
                 char = next_char
 
         try:
             output_string += char
-        except TypeError: #char is NoneType
+        except TypeError:  # char is NoneType
             raise ValueError('unbalanced "')
 
-    return ''.join(output_string)
+    return "".join(output_string)
 
 
 def read_atom(reader):
@@ -177,31 +200,32 @@ def read_atom(reader):
     Returns mal_type
     """
     token = reader.next()
-    if token[0].isdigit() or (len(token)>1 and token[0] == '-' and token[1].isdigit()):
+    if token[0].isdigit() or (
+        len(token) > 1 and token[0] == "-" and token[1].isdigit()
+    ):
         return mal_types.Int(token)
 
     elif token[0] == '"':
         return mal_types.String(remove_escape_backslash(token[1:-1]))
-    
-    elif token[0] == ':':
+
+    elif token[0] == ":":
         return mal_types.Keyword(token)
-    
-    elif token == 'nil':
+
+    elif token == "nil":
         return mal_types.Nil()
 
-    elif token == 'true':
+    elif token == "true":
         return mal_types.true()
-    
-    elif token == 'false':
+
+    elif token == "false":
         return mal_types.false()
 
     else:
         return mal_types.Symbol(token)
+
 
 def read_str(line):
     tokens = tokenize(line)
     tokens = remove_new_lines(tokens)
     reader = Reader(tokens)
     return read_form(reader)
-
-
