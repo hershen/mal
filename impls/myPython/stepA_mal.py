@@ -5,19 +5,30 @@ import os
 import readline
 import sys
 
+import core
 import env
 import mal_types
-import core
-import reader
 import printer
+import reader
 
-history_filename = os.path.join(os.path.dirname(__file__), ".history")
 history_size = 1000
-if not os.path.exists(history_filename):
-    open(history_filename, "a").close()
+history_filename = ".history"
 
-readline.read_history_file(history_filename)
-readline.set_history_length(history_size)
+
+class CommandHistory:
+    def __init__(self):
+        self.history_filename = os.path.join(
+            os.path.dirname(__file__), history_filename
+        )
+        if not os.path.exists(self.history_filename):
+            open(self.history_filename, "a").close()
+
+    def open_history_file(self):
+        readline.read_history_file(history_filename)
+        readline.set_history_length(history_size)
+
+    def close_history_file(self):
+        readline.write_history_file(history_filename)
 
 
 class UnrecognizedSymbol(Exception):
@@ -261,6 +272,9 @@ def print_startup_header():
 
 if __name__ == "__main__":
 
+    command_history = CommandHistory()
+    command_history.open_history_file()
+
     define_new_forms()
     set_argv()
 
@@ -298,4 +312,4 @@ if __name__ == "__main__":
         except mal_types.MalException as e:
             print(e)
 
-        readline.write_history_file(history_filename)
+    command_history.close_history_file()
