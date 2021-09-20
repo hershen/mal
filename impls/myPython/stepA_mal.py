@@ -16,6 +16,8 @@ history_filename = ".history"
 
 
 class CommandHistory:
+    """Allow command history, even between mal invocations"""
+
     def __init__(self):
         self.history_filename = os.path.join(
             os.path.dirname(__file__), history_filename
@@ -24,11 +26,11 @@ class CommandHistory:
             open(self.history_filename, "a").close()
 
     def open_history_file(self):
-        readline.read_history_file(history_filename)
+        readline.read_history_file(self.history_filename)
         readline.set_history_length(history_size)
 
     def close_history_file(self):
-        readline.write_history_file(history_filename)
+        readline.write_history_file(self.history_filename)
 
 
 class UnrecognizedSymbol(Exception):
@@ -39,8 +41,7 @@ repl_env = env.Env(mal_types.Nil())
 
 
 def eval_ast(mal_type, environment):
-    """
-    Evaluate each element of the ast (mal_type).
+    """Evaluate each element of the ast (mal_type), given the environment.
     If it's a List type, evaluate each element of the list.
     """
     if isinstance(mal_type, mal_types.Symbol):
@@ -99,9 +100,10 @@ def EVAL(mal_type, environment):
         if not isinstance(mal_type, mal_types.List):
             return eval_ast(mal_type, environment)
 
-        if len(mal_type):  # mal_type is non-empty List
+        if len(mal_type) > 0:
 
             mal_type = macroexpand(mal_type, environment)
+
             # Ensure result is still List
             if not isinstance(mal_type, mal_types.List):
                 return eval_ast(mal_type, environment)
