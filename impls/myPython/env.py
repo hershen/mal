@@ -7,9 +7,9 @@ class Env:
     def __init__(self, outer, binds=[], exprs=[]):
         self.outer = outer
         if '&' in binds:
-            ampercand_index = binds.index('&')
-            self.data = {key: expr for key, expr in zip(binds[:ampercand_index], exprs[:ampercand_index])}
-            self.data[binds[ampercand_index + 1]] = exprs[ampercand_index:]
+            ampersand_index = binds.index('&')
+            self.data = {key: expr for key, expr in zip(binds[:ampersand_index], exprs[:ampersand_index])}
+            self.data[binds[ampersand_index + 1]] = exprs[ampersand_index:]
         else:
             self.data = {key: expr for key, expr in zip(binds, exprs)}
 
