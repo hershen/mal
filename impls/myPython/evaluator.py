@@ -52,18 +52,29 @@ def eval_ast(mal_type, environment):
     return mal_type
 
 
+def expand_macro(mal_type, environment):
+    while is_macro_call(mal_type, environment):
+        function = environment.get(mal_type[0])
+        args = mal_type[1:]
+        mal_type = function(*args)
+
+    return mal_type
+
+
 class Evaluator:
+    """Evaluate a mal expression.
+    Intended use:
+    ```
+    Evaluator(mal_type, environment).EVAL()
+    ```
+
+    As some programming langauges have a limit on the recurssion depth, Evaluator implements
+    Tail Call Optimization (TCO) to reduce the recurssion depth.
+    """
+
     def __init__(self, mal_type, environment):
         self.mal_type = mal_type
         self.environment = environment
-
-    def macroexpand(self, mal_type, environment):
-        while is_macro_call(mal_type, environment):
-            function = environment.get(mal_type[0])
-            args = mal_type[1:]
-            mal_type = function(*args)
-
-        return mal_type
 
     def process_try(self):
         try:
@@ -120,8 +131,8 @@ class Evaluator:
         self.mal_type = self.mal_type[-1]
 
     def process_if(self):
-        """Return None in order to continue processing in while loop,
-        or something other than None if processing is final.
+        """Return None in order to continue evaluation in the while loop,
+        or something other than None to finilize the evaluation.
         """
         condition = Evaluator(self.mal_type[1], self.environment).EVAL()
         if isinstance(condition, mal_types.Nil) or isinstance(
@@ -149,11 +160,11 @@ class Evaluator:
 
     def process_quasiquote(self):
         quasiquote_returned = core.quasiquote(self.mal_type[1])
-        self.mal_type = quasiquote_returned  # evaluate value returned by quasiquote by tail call optimation in next while iteration
+        self.mal_type = quasiquote_returned
 
     def process_regular_list(self):
-        """Return None in order to continue processing in while loop,
-        or something other than None if processing is final.
+        """Return None in order to continue evaluation in the while loop,
+        or something other than None to finilize the evaluation.
         """
         evaluated_list = eval_ast(self.mal_type, self.environment)
         function = evaluated_list[0]
@@ -173,7 +184,7 @@ class Evaluator:
                 return eval_ast(self.mal_type, self.environment)
 
             if len(self.mal_type) > 0:
-                self.mal_type = self.macroexpand(self.mal_type, self.environment)
+                self.mal_type = expand_macro(self.mal_type, self.environment)
 
                 # Ensure result is still List
                 if not isinstance(self.mal_type, mal_types.List):
@@ -216,7 +227,7 @@ class Evaluator:
                     self.process_quasiquote()
 
                 elif operation_type == "macroexpand":
-                    return self.macroexpand(self.mal_type[1], self.environment)
+                    return expand_macro(self.mal_type[1], self.environment)
 
                 else:  # "regular" list
                     return_value = self.process_regular_list()
