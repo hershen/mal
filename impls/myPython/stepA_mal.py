@@ -51,14 +51,20 @@ def eval_ast(mal_type, environment):
             raise UnrecognizedSymbol(f"Unrecognized symbol {mal_type}")
 
     if isinstance(mal_type, mal_types.List):
-        return mal_types.List([EVAL(item, environment) for item in mal_type])
+        return mal_types.List(
+            [Evaluator(item, environment).EVAL() for item in mal_type]
+        )
 
     if isinstance(mal_type, mal_types.Vector):
-        return mal_types.Vector([EVAL(item, environment) for item in mal_type])
+        return mal_types.Vector(
+            [Evaluator(item, environment).EVAL() for item in mal_type]
+        )
 
     if isinstance(mal_type, mal_types.Hash_map):
         eval_only_values = (
-            lambda index, item: item if index % 2 == 0 else EVAL(item, environment)
+            lambda index, item: item
+            if index % 2 == 0
+            else Evaluator(item, environment).EVAL()
         )
         return mal_types.Hash_map(
             [eval_only_values(index, item) for index, item in enumerate(mal_type)]
@@ -95,131 +101,166 @@ def macroexpand(mal_type, environment):
     return mal_type
 
 
-def EVAL(mal_type, environment):
-    while True:
-        if not isinstance(mal_type, mal_types.List):
-            return eval_ast(mal_type, environment)
+class Evaluator:
+    def __init__(self, mal_type, environment):
+        self.mal_type = mal_type
+        self.environment = environment
 
-        if len(mal_type) > 0:
+    def process_try(self):
+        try:
+            return Evaluator(self.mal_type[1], self.environment).EVAL()
+        except Exception as exception:
+            try:
+                catch_block = self.mal_type[2]
+            except IndexError:
+                raise env.MissingKeyInEnvironment(f"{self.mal_type[1]} not found")
 
-            mal_type = macroexpand(mal_type, environment)
+            bind = catch_block[1]
+            exception_value = (
+                exception.value
+                if isinstance(exception, mal_types.MalException)
+                else mal_types.String(str(exception))
+            )
+            new_environment = env.Env(
+                outer=self.environment, binds=[bind], exprs=[exception_value]
+            )
 
-            # Ensure result is still List
-            if not isinstance(mal_type, mal_types.List):
-                return eval_ast(mal_type, environment)
+            new_eval = catch_block[2]
+            return Evaluator(new_eval, new_environment).EVAL()
 
-            operation_type = mal_type[0]
+    def process_def(self):
+        key = self.mal_type[1]
+        value = Evaluator(self.mal_type[2], self.environment).EVAL()
+        self.environment.set(key, value)
+        return value
 
-            if operation_type == "try*":
-                try:
-                    return EVAL(mal_type[1], environment)
-                except Exception as exception:
-                    try:
-                        catch_block = mal_type[2]
-                    except IndexError:
-                        raise env.MissingKeyInEnvironment(f"{mal_type[1]} not found")
+    def process_defmacro(self):
+        key = self.mal_type[1]
+        function = Evaluator(self.mal_type[2], self.environment).EVAL()
+        function = copy.deepcopy(function)  # do not mutate orignal function
+        function.is_macro = mal_types.true()
+        self.environment.set(key, function)
+        return function
 
-                    bind = catch_block[1]
-                    exception_value = (
-                        exception.value
-                        if isinstance(exception, mal_types.MalException)
-                        else mal_types.String(str(exception))
-                    )
-                    new_environment = env.Env(
-                        outer=environment, binds=[bind], exprs=[exception_value]
-                    )
+    def process_let(self):
+        let_environment = env.Env(outer=self.environment)
+        binding_list = self.mal_type[1]
 
-                    new_eval = catch_block[2]
-                    return EVAL(new_eval, new_environment)
+        for key, unevaluated_value in zip(binding_list[::2], binding_list[1::2]):
+            let_environment.set(
+                key, Evaluator(unevaluated_value, let_environment).EVAL()
+            )
 
-            if operation_type == "def!":
-                key = mal_type[1]
-                value = EVAL(mal_type[2], environment)
-                environment.set(key, value)
-                return value
+        # Tail call optimization - instead of return EVAL(expression, let_environment)
+        self.environment = let_environment
+        expression = self.mal_type[2]
+        self.mal_type = expression
 
-            if operation_type == "defmacro!":
-                key = mal_type[1]
-                function = EVAL(mal_type[2], environment)
-                function = copy.deepcopy(function)  # do not mutate orignal function
-                function.is_macro = mal_types.true()
-                environment.set(key, function)
-                return function
+    def process_do(self):
+        evaluated_list = eval_ast(self.mal_type[1:-1], self.environment)
+        self.mal_type = self.mal_type[-1]
 
-            elif operation_type == "let*":
-                let_environment = env.Env(outer=environment)
-                binding_list = mal_type[1]
+    def process_if(self):
+        condition = Evaluator(self.mal_type[1], self.environment).EVAL()
+        if isinstance(condition, mal_types.Nil) or isinstance(
+            condition, mal_types.false
+        ):
+            try:
+                self.mal_type = self.mal_type[3]
+            except IndexError:  # No false expression provided
+                return mal_types.Nil()
+        else:
+            self.mal_type = self.mal_type[2]
 
-                for key, unevaluated_value in zip(
-                    binding_list[::2], binding_list[1::2]
-                ):
-                    let_environment.set(key, EVAL(unevaluated_value, let_environment))
+    def process_fn(self):
+        def closure(*args):
+            binds = self.mal_type[1]
+            exprs = mal_types.List([*args])
+            new_environment = env.Env(self.environment, binds, exprs)
+            function_body = self.mal_type[2]
+            return Evaluator(function_body, new_environment).EVAL()
 
-                # Tail call optimization - instead of return EVAL(expression, let_environment)
-                environment = let_environment
-                expression = mal_type[2]
-                mal_type = expression
+        params = self.mal_type[1]
+        body = self.mal_type[2]
+        fn = closure
+        return mal_types.FunctionState(body, params, self.environment, fn)
 
-            elif operation_type == "do":
-                evaluated_list = eval_ast(mal_type[1:-1], environment)
-                mal_type = mal_type[-1]
+    def process_quasiquote(self):
+        quasiquote_returned = core.quasiquote(self.mal_type[1])
+        self.mal_type = quasiquote_returned  # evaluate value returned by quasiquote by tail call optimation in next while iteration
 
-            elif operation_type == "if":
-                condition = EVAL(mal_type[1], environment)
-                if isinstance(condition, mal_types.Nil) or isinstance(
-                    condition, mal_types.false
-                ):
-                    try:
-                        mal_type = mal_type[3]
-                    except IndexError:  # No false expression provided
-                        return mal_types.Nil()
-                else:
-                    mal_type = mal_type[2]
+    def process_regular_list(self):
+        evaluated_list = eval_ast(self.mal_type, self.environment)
+        function = evaluated_list[0]
+        operands = evaluated_list[1:]
 
-            elif operation_type == "fn*":
+        if isinstance(function, mal_types.FunctionState):
+            self.mal_type = function.mal_type
+            self.environment = env.Env(
+                outer=function.env, binds=function.params, exprs=operands
+            )
+        else:
+            return function(*operands)
 
-                def closure(*args):
-                    binds = mal_type[1]
-                    exprs = mal_types.List([*args])
-                    new_environment = env.Env(environment, binds, exprs)
-                    function_body = mal_type[2]
-                    return EVAL(function_body, new_environment)
+    def EVAL(self):
+        while True:
+            if not isinstance(self.mal_type, mal_types.List):
+                return eval_ast(self.mal_type, self.environment)
 
-                params = mal_type[1]
-                body = mal_type[2]
-                fn = closure
-                return mal_types.FunctionState(body, params, environment, fn)
+            if len(self.mal_type) > 0:
+                self.mal_type = macroexpand(self.mal_type, self.environment)
 
-            elif operation_type == "quote":
-                return mal_type[1]
+                # Ensure result is still List
+                if not isinstance(self.mal_type, mal_types.List):
+                    return eval_ast(self.mal_type, self.environment)
 
-            elif (
-                operation_type == "quasiquoteexpand"
-            ):  # Supposed to be used for debugging - in practice used to pass all tests
-                return core.quasiquote(mal_type[1])
+                operation_type = self.mal_type[0]
 
-            elif operation_type == "quasiquote":
-                quasiquote_returned = core.quasiquote(mal_type[1])
-                mal_type = quasiquote_returned  # evaluate value returned by quasiquote by tail call optimation in next while iteration
+                if operation_type == "try*":
+                    return self.process_try()
 
-            elif operation_type == "macroexpand":
-                return macroexpand(mal_type[1], environment)
+                if operation_type == "def!":
+                    return self.process_def()
 
-            else:  # "regular" list
-                evaluated_list = eval_ast(mal_type, environment)
-                function = evaluated_list[0]
-                operands = evaluated_list[1:]
+                if operation_type == "defmacro!":
+                    return self.process_defmacro()
 
-                if isinstance(function, mal_types.FunctionState):
-                    mal_type = function.mal_type
-                    environment = env.Env(
-                        outer=function.env, binds=function.params, exprs=operands
-                    )
-                else:
-                    return function(*operands)
+                elif operation_type == "let*":
+                    self.process_let()
 
-        else:  # mal_type is empty List
-            return mal_type
+                elif operation_type == "do":
+                    self.process_do()
+
+                elif operation_type == "if":
+                    return_value = self.process_if()
+                    if return_value is not None:
+                        return return_value
+                    # otherwise, continue while loop
+
+                elif operation_type == "fn*":
+                    return self.process_fn()
+
+                elif operation_type == "quote":
+                    return self.mal_type[1]
+
+                # Supposed to be used for debugging - in practice used to pass all tests
+                elif operation_type == "quasiquoteexpand":
+                    return core.quasiquote(self.mal_type[1])
+
+                elif operation_type == "quasiquote":
+                    self.process_quasiquote()
+
+                elif operation_type == "macroexpand":
+                    return macroexpand(self.mal_type[1], self.environment)
+
+                else:  # "regular" list
+                    return_value = self.process_regular_list()
+                    if return_value is not None:
+                        return return_value
+                    # otherwise, continue while loop
+
+            else:  # mal_type is empty List
+                return self.mal_type
 
 
 def PRINT(mal_type):
@@ -228,7 +269,7 @@ def PRINT(mal_type):
 
 def rep(line):
     read = READ(line)
-    evaluated = EVAL(read, repl_env)
+    evaluated = Evaluator(read, repl_env).EVAL()
     printed = PRINT(evaluated)
     return printed
 
@@ -256,7 +297,7 @@ def define_new_forms():
 
     # eval functionality
     def mal_eval(mal_type):
-        return EVAL(mal_type, repl_env)
+        return Evaluator(mal_type, repl_env).EVAL()
 
     repl_env.set("eval", mal_eval)
 
