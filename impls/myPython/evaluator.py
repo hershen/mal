@@ -1,5 +1,6 @@
 import copy
 
+import core
 import env
 import mal_types
 
@@ -27,7 +28,7 @@ def eval_ast(mal_type, environment):
         try:
             return environment.get(mal_type)
         except KeyError:
-            raise UnrecognizedSymbol(f"Unrecognized symbol {mal_type}")
+            raise mal_types.UnrecognizedSymbol(f"Unrecognized symbol {mal_type}")
 
     elif isinstance(mal_type, mal_types.List):
         return mal_types.List(

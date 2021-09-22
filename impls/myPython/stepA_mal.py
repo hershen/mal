@@ -33,10 +33,6 @@ class CommandHistory:
         readline.write_history_file(self.history_filename)
 
 
-class UnrecognizedSymbol(Exception):
-    pass
-
-
 repl_environment = env.Env(mal_types.Nil())
 
 
@@ -119,7 +115,7 @@ if __name__ == "__main__":
             print(evaluated_line)
         except (
             ValueError,
-            UnrecognizedSymbol,
+            mal_types.UnrecognizedSymbol,
             env.MissingKeyInEnvironment,
             FileNotFoundError,
             core.IndexOutOfBounds,

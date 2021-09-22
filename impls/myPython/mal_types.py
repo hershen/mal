@@ -12,6 +12,10 @@ class MalException(Exception):
         return repr(self.value)
 
 
+class UnrecognizedSymbol(Exception):
+    pass
+
+
 class Atom:
     def __init__(self, mal_value):
         self.mal_value = mal_value
