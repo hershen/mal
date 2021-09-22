@@ -41,7 +41,7 @@ def READ(line):
 
 
 def PRINT(mal_type):
-    return printer.pr_str(mal_type, print_readably=True)
+    return printer.print_string(mal_type, print_readably=True)
 
 
 def read_eval_print(line):
@@ -84,7 +84,7 @@ def define_new_forms():
     read_eval_print('(def! *host-language* "python3")')
 
     # core forms
-    for key, value in core.ns.items():
+    for key, value in core.namespace.items():
         repl_environment.set(key, value)
 
 

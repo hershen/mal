@@ -12,7 +12,7 @@ def add_escape_backslash(input_string):
     return mal_types.String(input_string_with_escape_chars.replace(chr(10), "\\n"))
 
 
-def pr_str(mal_type, print_readably):
+def print_string(mal_type, print_readably):
     if callable(mal_type):
         return "#<function>"
 
@@ -22,7 +22,7 @@ def pr_str(mal_type, print_readably):
     elif isinstance(mal_type, mal_types.List_variant):
         return (
             mal_type.open_paren
-            + " ".join(pr_str(item, print_readably) for item in mal_type)
+            + " ".join(print_string(item, print_readably) for item in mal_type)
             + mal_type.close_paren
         )
 

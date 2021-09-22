@@ -17,21 +17,21 @@ def true_false(x):
 
 def prstr(*items):
     joined_string = " ".join(
-        [printer.pr_str(item, print_readably=True) for item in items]
+        [printer.print_string(item, print_readably=True) for item in items]
     )
     return mal_types.String(joined_string)
 
 
 def str_function(*items):
     joined_string = "".join(
-        [str(printer.pr_str(item, print_readably=False)) for item in items]
+        [str(printer.print_string(item, print_readably=False)) for item in items]
     )
     return mal_types.String(joined_string)
 
 
 def prn(*items):
     joined_string = " ".join(
-        [str(printer.pr_str(item, print_readably=True)) for item in items]
+        [str(printer.print_string(item, print_readably=True)) for item in items]
     )
     print(joined_string)
     return mal_types.Nil()
@@ -39,7 +39,7 @@ def prn(*items):
 
 def println(*items):
     joined_string = " ".join(
-        [str(printer.pr_str(item, print_readably=False)) for item in items]
+        [str(printer.print_string(item, print_readably=False)) for item in items]
     )
     print(joined_string)
     return mal_types.Nil()
@@ -211,7 +211,6 @@ def ismacro(mal_type):
 
 
 def isfn(mal_type):
-
     if isinstance(mal_type, mal_types.FunctionState):
         return not mal_type.is_macro
 
@@ -239,7 +238,7 @@ def seq(mal_type):
         return mal_types.List([mal_types.String(char) for char in mal_type])
 
 
-ns = {
+namespace = {
     mal_types.Symbol("+"): mal_types.NativeFunction(operator.add),
     mal_types.Symbol("-"): mal_types.NativeFunction(operator.sub),
     mal_types.Symbol("*"): mal_types.NativeFunction(operator.mul),

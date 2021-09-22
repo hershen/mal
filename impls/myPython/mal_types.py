@@ -71,15 +71,15 @@ class Int(int):
 
 
 class String:
+    def __init__(self, *args):
+        self.string = str(*args)
+
     def __eq__(self, other):
         if isinstance(other, String):
             return self.string == other.string
         elif isinstance(other, str):
             return self.string == other
         return False
-
-    def __init__(self, *args):
-        self.string = str(*args)
 
     def __iter__(self):
         for item in self.string:
@@ -96,9 +96,6 @@ class Symbol:
     def __init__(self, string=""):
         self.string = string
 
-    def __repr__(self):
-        return self.string
-
     def __eq__(self, other):
         if isinstance(other, Symbol):
             return self.string == other
@@ -109,11 +106,20 @@ class Symbol:
     def __hash__(self):
         return hash(self.string)
 
+    def __repr__(self):
+        return self.string
+
 
 class List_variant:
     def __init__(self, *args):
         self.list = list(*args)
         self.meta = Nil()
+
+    def append(self, item):
+        self.list.append(item)
+
+    def __eq__(self, other):
+        return self.list == other
 
     def __iter__(self):
         for item in self.list:
@@ -125,22 +131,16 @@ class List_variant:
     def __repr__(self):
         return " ".join([repr(x) for x in self.list])
 
-    def append(self, item):
-        self.list.append(item)
-
-    def __eq__(self, other):
-        return self.list == other
-
 
 class Keyword:
+    def __init__(self, string):
+        self.string = string
+
     def __eq__(self, other):
         return isinstance(other, Keyword) and self.string == other.string
 
     def __hash__(self):
         return hash(self.string)
-
-    def __init__(self, string):
-        self.string = string
 
     def __repr__(self):
         return self.string
@@ -150,6 +150,9 @@ class List(List_variant):
     open_paren = "("
     close_paren = ")"
 
+    def __init__(self, *args):
+        super().__init__(*args)
+
     def __getitem__(self, indices):
         if isinstance(indices, slice):
             return List([item for item in self.list[indices]])
@@ -157,9 +160,6 @@ class List(List_variant):
 
     def __hash__(self):
         return hash(tuple(self.list))
-
-    def __init__(self, *args):
-        super().__init__(*args)
 
     def __repr__(self):
         return self.open_paren + super().__repr__() + self.close_paren
@@ -172,13 +172,13 @@ class Vector(List_variant):
     open_paren = "["
     close_paren = "]"
 
+    def __init__(self, *args):
+        super().__init__(*args)
+
     def __getitem__(self, indices):
         if isinstance(indices, slice):
             return Vector([item for item in self.list[indices]])
         return self.list[indices]
-
-    def __init__(self, *args):
-        super().__init__(*args)
 
     def __hash__(self):
         return hash(tuple(self.list))
@@ -194,6 +194,9 @@ class Hash_map(List_variant):
     open_paren = "{"
     close_paren = "}"
 
+    def __init__(self, *args):
+        super().__init__(*args)
+
     def __getitem__(self, indices):
         if isinstance(indices, slice):
             return Hash_map([item for item in self.list[indices]])
@@ -208,9 +211,6 @@ class Hash_map(List_variant):
 
     def __hash__(self):
         return hash(tuple(self.list))
-
-    def __init__(self, *args):
-        super().__init__(*args)
 
     def __repr__(self):
         return self.open_paren + super().__repr__() + self.close_paren
