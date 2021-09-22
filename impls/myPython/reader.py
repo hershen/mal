@@ -4,14 +4,18 @@ special_charecters = "[]{}()'`~^@"
 
 
 class Reader:
+    """Class to iterate through tokens."""
+
     def __init__(self, tokens):
         self.tokens = tokens
         self.current_index = 0
 
     def peek(self):
+        """Return current token, without advancing to the next token"""
         return self.tokens[self.current_index]
 
     def next(self):
+        """Return current token, and advance to the next token"""
         current_value = self.tokens[self.current_index]
         self.current_index += 1
 
@@ -26,6 +30,7 @@ def remove_white_spaces(line):
 
 
 def tokenize(line):
+    """parse a line of text into a list of mal tokens"""
 
     tokens = []
 
@@ -112,39 +117,19 @@ def is_list_type(token):
     return token[0] in mal_types.closing_paren_style.keys()
 
 
-def read_quote(reader):
+def parse_quote(reader):
     quote_symbol = reader.next()
-    return mal_types.List([quote_symbol_to_word[quote_symbol], read_form(reader)])
+    return mal_types.List([quote_symbol_to_word[quote_symbol], parse_token(reader)])
 
 
-def read_with_meta(reader):
-    carrot_symbol = reader.next()
-    first_arg = read_form(reader)
-    second_arg = read_form(reader)
+def parse_with_meta(reader):
+    _ = reader.next()  # This is the carrot symbol
+    first_arg = parse_token(reader)
+    second_arg = parse_token(reader)
     return mal_types.List([mal_types.Symbol("with-meta"), second_arg, first_arg])
 
 
-def read_form(reader):
-    """ "
-    Peek at next token and returns mal_type.
-    """
-
-    if reader.empty():
-        return mal_types.String("")
-
-    next_token = reader.peek()
-
-    if is_list_type(next_token):
-        return read_list(reader)
-    elif next_token in quote_symbol_to_word.keys():
-        return read_quote(reader)
-    elif next_token == "^":
-        return read_with_meta(reader)
-    else:
-        return read_atom(reader)
-
-
-def read_list(reader):
+def parse_list(reader):
     open_paren = reader.next()  # This should be the opening paren type ( [ {
 
     if open_paren == "(":
@@ -153,20 +138,27 @@ def read_list(reader):
         mal_list_variant = mal_types.Vector()
     elif open_paren == "{":
         mal_list_variant = mal_types.Hash_map()
+    else:
+        raise ValueError(f"Unrecognized open paren {open_paren}")
 
-    closing_paren = mal_types.closing_paren_style[open_paren]
     while True:
         if reader.empty():
             raise ValueError(f'unbalanced "{mal_list_variant.open_paren}"')
 
-        mal_object = read_form(reader)
+        mal_object = parse_token(reader)
 
-        if mal_object == closing_paren:
+        if mal_object == mal_list_variant.close_paren:
             break
 
         mal_list_variant.append(mal_object)
 
     return mal_list_variant
+
+
+def isNumber(string):
+    return string[0].isdigit() or (
+        len(string) > 1 and string[0] == "-" and string[1].isdigit()
+    )
 
 
 slash_preceded_charecters = ["\\", '"']
@@ -195,14 +187,11 @@ def remove_escape_backslash(input_string):
     return "".join(output_string)
 
 
-def read_atom(reader):
-    """
-    Returns mal_type
-    """
+def parse_single_token(reader):
+    """Returns mal type"""
+
     token = reader.next()
-    if token[0].isdigit() or (
-        len(token) > 1 and token[0] == "-" and token[1].isdigit()
-    ):
+    if isNumber(token):
         return mal_types.Int(token)
 
     elif token[0] == '"':
@@ -224,8 +213,26 @@ def read_atom(reader):
         return mal_types.Symbol(token)
 
 
-def read_str(line):
+def parse_token(reader):
+    """Peek at next token and parse with the appropriate function"""
+
+    if reader.empty():
+        return mal_types.String("")
+
+    next_token = reader.peek()
+
+    if is_list_type(next_token):
+        return parse_list(reader)
+    elif next_token in quote_symbol_to_word.keys():
+        return parse_quote(reader)
+    elif next_token == "^":
+        return parse_with_meta(reader)
+    else:
+        return parse_single_token(reader)
+
+
+def parse_str(line):
     tokens = tokenize(line)
     tokens = remove_new_lines(tokens)
     reader = Reader(tokens)
-    return read_form(reader)
+    return parse_token(reader)

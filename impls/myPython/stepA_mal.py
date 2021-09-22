@@ -37,7 +37,7 @@ repl_environment = env.Env(mal_types.Nil())
 
 
 def READ(line):
-    return reader.read_str(str(line))
+    return reader.parse_str(str(line))
 
 
 def PRINT(mal_type):
