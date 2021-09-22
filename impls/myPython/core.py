@@ -11,16 +11,8 @@ class IndexOutOfBounds(Exception):
     pass
 
 
-def prn(*x):
-    try:
-        print(printer.pr_str(x[0], print_readably=True))
-    except IndexError:
-        pass
-    return "nil"
-
-
 def true_false(x):
-    return mal_types.true() if x else mal_types.false()
+    return mal_types.TrueType() if x else mal_types.FalseType()
 
 
 def prstr(*items):
@@ -291,10 +283,10 @@ ns = {
         isinstance(mal_type, mal_types.Nil)
     ),
     mal_types.Symbol("true?"): lambda mal_type: true_false(
-        isinstance(mal_type, mal_types.true)
+        isinstance(mal_type, mal_types.TrueType)
     ),
     mal_types.Symbol("false?"): lambda mal_type: true_false(
-        isinstance(mal_type, mal_types.false)
+        isinstance(mal_type, mal_types.FalseType)
     ),
     mal_types.Symbol("keyword?"): lambda mal_type: true_false(
         isinstance(mal_type, mal_types.Keyword)

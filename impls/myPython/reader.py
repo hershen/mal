@@ -204,10 +204,10 @@ def parse_single_token(reader):
         return mal_types.Nil()
 
     elif token == "true":
-        return mal_types.true()
+        return mal_types.TrueType()
 
     elif token == "false":
-        return mal_types.false()
+        return mal_types.FalseType()
 
     else:
         return mal_types.Symbol(token)

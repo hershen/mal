@@ -12,12 +12,12 @@ def is_macro_call(mal_type, environment):
         try:
             function = environment.get(mal_type[0])
         except env.MissingKeyInEnvironment:
-            return mal_types.false()
+            return mal_types.FalseType()
 
         if isinstance(function, mal_types.FunctionState) and function.is_macro:
-            return mal_types.true()
+            return mal_types.TrueType()
 
-    return mal_types.false()
+    return mal_types.FalseType()
 
 
 def eval_ast(mal_type, environment):
@@ -109,7 +109,7 @@ class Evaluator:
         key = self.mal_type[1]
         function = Evaluator(self.mal_type[2], self.environment).EVAL()
         function = copy.deepcopy(function)  # do not mutate orignal function
-        function.is_macro = mal_types.true()
+        function.is_macro = mal_types.TrueType()
         self.environment.set(key, function)
         return function
 
@@ -137,7 +137,7 @@ class Evaluator:
         """
         condition = Evaluator(self.mal_type[1], self.environment).EVAL()
         if isinstance(condition, mal_types.Nil) or isinstance(
-            condition, mal_types.false
+            condition, mal_types.FalseType
         ):
             try:
                 self.mal_type = self.mal_type[3]

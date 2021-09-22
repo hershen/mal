@@ -2,6 +2,8 @@ closing_paren_style = {"(": ")", "[": "]", "{": "}"}
 
 
 class MalException(Exception):
+    """Exception that stores to be able to use it in a try/catch block"""
+
     def __init__(self, value):
         self.value = value
 
@@ -41,23 +43,23 @@ class Nil:
         return isinstance(other, Nil)
 
 
-class true:
+class TrueType:
     def __repr__(self):
         return "true"
 
     def __eq__(self, other):
-        return isinstance(other, true)
+        return isinstance(other, TrueType)
 
     def __bool__(self):
         return True
 
 
-class false:
+class FalseType:
     def __repr__(self):
         return "false"
 
     def __eq__(self, other):
-        return isinstance(other, false)
+        return isinstance(other, FalseType)
 
     def __bool__(self):
         return False
@@ -224,7 +226,7 @@ class Hash_map(List_variant):
 
 
 class FunctionState:
-    def __init__(self, mal_type, params, env, fn, is_macro=false()):
+    def __init__(self, mal_type, params, env, fn, is_macro=FalseType()):
         self.mal_type = mal_type
         self.params = params
         self.env = env
