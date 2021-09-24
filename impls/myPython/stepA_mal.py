@@ -92,8 +92,7 @@ def print_startup_header():
     read_eval_print('(println (str "Mal [" *host-language* "]"))')
 
 
-if __name__ == "__main__":
-
+def main():
     command_history = CommandHistory()
     command_history.open_history_file()
 
@@ -129,3 +128,7 @@ if __name__ == "__main__":
             break
 
     command_history.save_history_file()
+
+
+if __name__ == "__main__":
+    main()
