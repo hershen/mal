@@ -1,5 +1,8 @@
 # mal - Make a Lisp
 
+This project implements an interpreter for the list-like [mal programming language](https://github.com/kanaka/mal) in Python3.
+Everything in this folder is written as part of this project. Other folders in this repository implement the test infrastructure, and were provided by the mal project.
+
 - Tail Call Optimization
 
 | Function | Input | Output | Example |
