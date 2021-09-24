@@ -1,1 +1,4 @@
 .history
+build/
+dist/
+*egg*/
