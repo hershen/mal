@@ -9,7 +9,7 @@ setup(
         "An implementation of the list-like programming language mal in Python3."
     ),
     install_requires=['readline'],
-    entry_points={"console_scripts":"mal=malPython.stapA_mal:main"},
+    entry_points={"console_scripts":"mal=malPython.stepA_mal:main"},
     url="https://github.com/hershen/mal/tree/master/impls/myPython",
     python_requires='~=3.6',
     packages=["malPython"],
