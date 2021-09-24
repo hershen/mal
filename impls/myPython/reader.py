@@ -1,4 +1,4 @@
-import mal_types
+from mal_python import mal_types
 
 special_charecters = "[]{}()'`~^@"
 

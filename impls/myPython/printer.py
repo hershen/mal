@@ -1,5 +1,5 @@
-import mal_types
-import reader
+from mal_python import mal_types
+from mal_python import reader
 
 
 def add_escape_backslash(input_string):

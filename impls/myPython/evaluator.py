@@ -1,8 +1,8 @@
 import copy
 
-import core
-import env
-import mal_types
+from mal_python import core
+from mal_python import env
+from mal_python import mal_types
 
 
 def is_macro_call(mal_type, environment):

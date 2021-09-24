@@ -2,9 +2,9 @@ import copy
 import operator
 import time
 
-import mal_types
-import printer
-import reader
+from mal_python import mal_types
+from mal_python import printer
+from mal_python import reader
 
 
 class IndexOutOfBounds(Exception):

@@ -4,12 +4,12 @@ import os
 import readline
 import sys
 
-import core
-import env
-import evaluator
-import mal_types
-import printer
-import reader
+from mal_python import core
+from mal_python import env
+from mal_python import evaluator
+from mal_python import mal_types
+from mal_python import printer
+from mal_python import reader
 
 history_size = 1000
 history_filename = ".history"

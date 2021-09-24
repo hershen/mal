@@ -1,16 +1,21 @@
 from setuptools import setup
 
+import sys
+
+if sys.version_info[0] < 3:
+    raise Exception("Python 3 or a more recent version is required.")
+
 setup(
-    name="malPython",
+    name="mal_python",
     version="0.1",
     author="Alon Hershenhorn",
     author_email="hershen@gmail.com",
     description=(
         "An implementation of the list-like programming language mal in Python3."
     ),
-    install_requires=['readline'],
-    entry_points={"console_scripts":"mal=malPython.stepA_mal:main"},
-    url="https://github.com/hershen/mal/tree/master/impls/myPython",
-    python_requires='~=3.6',
-    packages=["malPython"],
+    install_requires=["readline"],
+    entry_points={"console_scripts":"mal=mal_python.stepA_mal:main"},
+    url="https://github.com/hershen/mal/tree/master/impls/mal_python",
+    python_requires=">=3.6",
+    packages=["mal_python"],
 )
