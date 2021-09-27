@@ -7,7 +7,7 @@ if sys.version_info[0] < 3:
 
 setup(
     name="mal_python",
-    version="0.12",
+    version="1.0",
     author="Alon Hershenhorn",
     author_email="hershen@gmail.com",
     description=(
