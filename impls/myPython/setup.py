@@ -7,7 +7,7 @@ if sys.version_info[0] < 3:
 
 setup(
     name="mal_python",
-    version="1.0",
+    version="1.1",
     author="Alon Hershenhorn",
     author_email="hershen@gmail.com",
     description=(
@@ -16,7 +16,10 @@ setup(
     long_description=(
         "This is an implementation of the lisp-like programming langauge mal.\nIt is implemented in Python3."
     ),
-    install_requires=["readline"],
+    install_requires=[
+        'readline; platform_system == "Linux"',
+        'pyreadline; platform_system == "Windows"',
+    ],
     entry_points={"console_scripts": "mal=mal_python.stepA_mal:main"},
     url="https://github.com/hershen/mal/tree/master/impls/myPython",
     python_requires=">=3.6",
