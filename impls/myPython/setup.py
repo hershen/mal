@@ -7,14 +7,17 @@ if sys.version_info[0] < 3:
 
 setup(
     name="mal_python",
-    version="0.1",
+    version="0.11",
     author="Alon Hershenhorn",
     author_email="hershen@gmail.com",
     description=(
-        "An implementation of the list-like programming language mal in Python3."
+        "An implementation of the lisp-like programming language mal in Python3."
+    ),
+    long_description=(
+        "This is an implementation of the lisp-like programming langauge mal.\nIt is implemented in Python3."
     ),
     install_requires=["readline"],
-    entry_points={"console_scripts":"mal=mal_python.stepA_mal:main"},
+    entry_points={"console_scripts": "mal=mal_python.stepA_mal:main"},
     url="https://github.com/hershen/mal/tree/master/impls/mal_python",
     python_requires=">=3.6",
     packages=["mal_python"],
