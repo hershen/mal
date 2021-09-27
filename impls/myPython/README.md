@@ -42,7 +42,7 @@ This will run all the functional tests (provided as part of the [mal](https://gi
 | ---  | ---         | ---     |
 | `int` | Integer number | `12` |
 | `symobl` | Contains a string value | `sym` |
-| `keyword` | Similar to `symbol` but instance names start with a `:`. Can be used as `hash-map` keys. | :kw |
+| `keyword` | Similar to `symbol` but instance names start with a `:`. Can be used as `hash-map` keys. | `:kw` |
 | `string` | `mal`'s string type | `"str"` |
 | `nil` | Similar to Python's `NoneType` | `nil` |
 | `true` | `mal`'s true type | `true` |
