@@ -1,15 +1,20 @@
-# mal - Make a Lisp
+# `mal` in Python3
 
-This project implements an interpreter for the list-like [mal programming language](https://github.com/kanaka/mal) in Python3.
+This project is an implementation of an interpreter for the lisp-like [mal](https://github.com/kanaka/mal) programming language in Python3.
+
+`mal` is a lisp-like language. It's also a project that encourages implementations of interpreters in different programming languages. It provides an outline of how to go about writing an interpreter implantation.
+
+This project follows that guide and implements an interpreter in the Python3 language.
 Everything in this folder is written as part of this project. Other folders in this repository implement the test infrastructure, and were provided by the `mal` project.
 
-##Features
+The implementation incorporates [Tail Call Optimization]() (TCO) to reduce the recursion depth.
+## Features
 
 - Tail Call Optimization.
-- Comments - anything after a `;` is ignored until the end of the line.
 
+# Language reference
 
-##Types
+## Types
 
 | Type | Explanation | Example |
 | ---  | ---         | ---     |
@@ -24,8 +29,11 @@ Everything in this folder is written as part of this project. Other folders in t
 | `vector` | Similar to `list`s, but use square brackets (`[]`) as delimiters. | `["a" 1]` |
 | `hash-map` | Data structure that maps `string`s and `keywords` into other `mal` types. Delimited with curly braces (`{}`). The odd entries are the keys and the even entries are the values. | `{"a" 1 :k "str"}` |
 
+## Comments
+Comments are written with `;`. Anything after a `;` is ignored until the end of the line.
+
 ## Processing of `mal` types
-When a `list` is processed, the first element is invoked or exeuted on the rest of the elements. For example:
+When a `list` is processed, the first element is invoked or executed on the rest of the elements. For example:
 
 - `(+ 1 2)` &rArr; `3`
 - `(+ 2 (* 3 4))` &rArr; `14`
