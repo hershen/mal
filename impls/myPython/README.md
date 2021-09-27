@@ -2,15 +2,34 @@
 
 This project is an implementation of an interpreter for the lisp-like [mal](https://github.com/kanaka/mal) programming language in Python3.
 
-`mal` is a lisp-like language. It's also a project that encourages implementations of interpreters in different programming languages. It provides an outline of how to go about writing an interpreter implantation.
-
+[mal](https://github.com/kanaka/mal) is a lisp-like language. It provides a guide on how to go about writing a new interpreter implantation. 
 This project follows that guide and implements an interpreter in the Python3 language.
 Everything in this folder is written as part of this project. Other folders in this repository implement the test infrastructure, and were provided by the `mal` project.
 
-The implementation incorporates [Tail Call Optimization]() (TCO) to reduce the recursion depth.
-## Features
+As Python3 has a maximum recursion depth, the implementation incorporates [Tail Call Optimization](https://en.wikipedia.org/wiki/Tail_call) (TCO) which limits growth of the call stack by re-using the last stack frame, when possible. This prevents, for example, a recursion based Fibonacci calculator from exceeding the maximum recursion depth when calculating a large Fibonacci number.
 
-- Tail Call Optimization.
+The `mal` language is self-hosting, meaning a `mal` interpreter can run an implementation of a `mal` interpreter written in the `mal` language. All the functional tests can be run in self hosting mode.
+
+## Requirements
+- A Python3 interpreter, version >= 3.6.
+
+### For running the tests
+- Ability to process MakeFiles.
+
+## Installation
+```
+pip3 install mal_python
+```
+
+To run the interpreter, run `mal`.
+
+## Running the test suite
+
+- Clone this repository.
+- `cd mal`
+- `make MAL_IMPL=myPython "test^mal"`
+
+This will run all the functional tests (provided by the [mal](https://github.com/kanaka/mal) project) in self hosting mode.
 
 # Language reference
 
