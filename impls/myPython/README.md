@@ -23,6 +23,8 @@ pip3 install mal_python
 
 To run the interpreter, run `mal`.
 
+Cross platform - tested on Linux and Windows.
+
 ## Running the test suite
 
 - Clone this repository.
