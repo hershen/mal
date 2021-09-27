@@ -13,7 +13,8 @@ The `mal` language is self-hosting, meaning a `mal` interpreter can run an imple
 ## Requirements
 - A Python3 interpreter, version >= 3.6.
 
-### For running the tests
+For running the tests:
+
 - Ability to process MakeFiles.
 
 ## Installation
@@ -31,7 +32,7 @@ Cross platform - tested on Linux and Windows.
 - `cd mal`
 - `make MAL_IMPL=myPython "test^mal"`
 
-This will run all the functional tests (provided by the [mal](https://github.com/kanaka/mal) project) in self hosting mode.
+This will run all the functional tests (provided as part of the [mal](https://github.com/kanaka/mal) guide) in self hosting mode (this Python3 interpreter runs an interpreter written in `mal` which runs the tests).
 
 # Language reference
 
@@ -41,7 +42,7 @@ This will run all the functional tests (provided by the [mal](https://github.com
 | ---  | ---         | ---     |
 | `int` | Integer number | `12` |
 | `symobl` | Contains a string value | `sym` |
-| `keyword` | Similar to `symbol` but instance names start with a `:`. Can be used as `hash-map` keys.
+| `keyword` | Similar to `symbol` but instance names start with a `:`. Can be used as `hash-map` keys. | :kw |
 | `string` | `mal`'s string type | `"str"` |
 | `nil` | Similar to Python's `NoneType` | `nil` |
 | `true` | `mal`'s true type | `true` |
