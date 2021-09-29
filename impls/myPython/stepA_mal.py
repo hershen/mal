@@ -92,21 +92,7 @@ def print_startup_header():
     read_eval_print('(println (str "Mal [" *host-language* "]"))')
 
 
-def main():
-    command_history = CommandHistory()
-    command_history.open_history_file()
-
-    define_new_forms()
-    set_argv()
-
-    if len(sys.argv) > 1:
-        filename = sys.argv[1]
-        read_eval_print(f'(load-file "{filename}")')
-        exit()
-
-    print_startup_header()
-
-    # Main REPL loop
+def repl_loop():
     while True:
         try:
             line = input("user> ")
@@ -125,7 +111,24 @@ def main():
             print()
         except EOFError:  # EOF
             print()
-            break
+            return
+
+
+def main():
+    command_history = CommandHistory()
+    command_history.open_history_file()
+
+    define_new_forms()
+    set_argv()
+
+    if len(sys.argv) > 1:
+        filename = sys.argv[1]
+        read_eval_print(f'(load-file "{filename}")')
+        exit()
+
+    print_startup_header()
+
+    repl_loop()
 
     command_history.save_history_file()
 
