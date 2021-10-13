@@ -97,9 +97,7 @@ class Symbol:
         self.string = string
 
     def __eq__(self, other):
-        if isinstance(other, Symbol):
-            return self.string == other
-        elif isinstance(other, str):
+        if isinstance(other, Symbol) or isinstance(other, str):
             return self.string == other
         return False
 
