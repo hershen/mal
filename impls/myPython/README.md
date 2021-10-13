@@ -10,6 +10,16 @@ As Python3 has a maximum recursion depth, the implementation incorporates [Tail 
 
 The `mal` language is self-hosting, meaning a `mal` interpreter can run an implementation of a `mal` interpreter written in the `mal` language. All the functional tests can be run in self hosting mode.
 
+## Examples
+Some examples of what can be run with the interpreter.
+
+### Calculate the Fibonacci numbers
+`(def! fib (fn* (N) (if (= N 0) 0 (if (= N 1) 1 (+ (fib (- N 1)) (fib (- N 2)))))))`
+
+Then:
+
+`(fib 8)` &rArr; `21`
+
 ## Requirements
 - A Python3 interpreter, version >= 3.6.
 
@@ -70,7 +80,10 @@ When a `hash-map` is evaluated, all the values (odd elements) are evaluated.
 | `let*` | A `list` with key value pairs, and an expression | The expression is evaluated using the additional symbols defined in the `list` | `(let* (c 2) c)` &rArr; `2` <br /> `(let* (z (+ 2 3)) (+ 1 z))` &rArr; `6` |
 | `do` | A series of elements | Evaluate all the elements, returning the last evaluated element | `(do (def! a 6) 7 (+ a 8))` &rArr; `14` |
 | `if` | a condition, an expression for true, and an optional expression for false | The evaluated expression for true if the condition evaluates to anything other than `nil` or `false`, or the evaluated expression for false, otherwise. If the condition evaluates to false and there is no expression for false, returns `nil`. | `(if true (+ 0 1) (+ 1 1))` &rArr; `1` <br /> `(if false (+ 0 1) (+ 1 1))` &rArr; `2` <br /> `(if false (+ 0 1))` &rArr; `nil` |
-| `fn*` | A `list` of symbols and an expression | A function object that evaluates the expression with the symbols from the `list` as arguments. A function object is meant to be called with a series of expressions matching the arguments. | `( (fn* (a b) (+ b a)) 3 4)` &rArr; `7` <br /> `(def! fib (fn* (N) (if (= N 0) 1 (if (= N 1) 1 (+ (fib (- N 1)) (fib (- N 2)))))))` &rArr; `#<function>` <br /> `(fib 5)` &rArr; `8` |
+| `fn*` | A `list` of symbols and an expression | A function object that evaluates the expression with the symbols from the `list` as arguments. A function object is meant to be called with a series of expressions matching the arguments. | `( (fn* (a b) (+ b a)) 3 4)` &rArr; `7` <br /> `(def! fib (fn* (N) (if (= N 0) 0 (if (= N 1) 1 (+ (fib (- N 1)) (fib (- N 2)))))))` &rArr; `#<function>` <br /> `(fib 8)` &rArr; `21` |
+| `slurp` | A string that represents a file name | The contents of the file as a string | `(slurp "hello-world.txt")` &rArr; `"hello world!\n"`|
+| `read-string` |  | | |
+| `eval` | A mal expression | The evaluated mal expression | `(def! expression (list + 1 2))` <br /> `(eval expression)` &rArr; `3` |
 | `cons` | A `mal` type and (a List or Vector) | A new List composed of the `mal` type and the elements of the List or the Vector | `(cons 1 (list 1 2 3))` &rArr; `(1 1 2 3)` |
 | `concat` | 0 or combinations of Lists and Vectors | A new list containing the elements of the input Lists and Vectors | `(concat (list 1 2) (list 3 4))` &rArr; `(1 2 3 4)` |
 | `quote` | A `mal` type | The `mal` type. If the `mal` type is not defined, treats it like a Symbol and returns the name of the Symbol. | `(quote abc)` &rArr; `abc` |
