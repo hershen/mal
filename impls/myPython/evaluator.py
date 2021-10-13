@@ -69,8 +69,8 @@ class Evaluator:
     Evaluator(mal_type, environment).EVAL()
     ```
 
-    As some programming langauges have a limit on the recurssion depth, Evaluator implements
-    Tail Call Optimization (TCO) to reduce the recurssion depth.
+    As some programming languages have a limit on the recursion depth, Evaluator implements
+    Tail Call Optimization (TCO) to reduce the recursion depth.
     """
 
     def __init__(self, mal_type, environment):
@@ -108,7 +108,7 @@ class Evaluator:
     def process_defmacro(self):
         key = self.mal_type[1]
         function = Evaluator(self.mal_type[2], self.environment).EVAL()
-        function = copy.deepcopy(function)  # do not mutate orignal function
+        function = copy.deepcopy(function)  # do not mutate original function
         function.is_macro = mal_types.TrueType()
         self.environment.set(key, function)
         return function
@@ -132,7 +132,7 @@ class Evaluator:
 
     def process_if(self):
         """Return None in order to continue evaluation in the while loop,
-        or something other than None to finilize the evaluation.
+        or something other than None to finalize the evaluation.
         """
         condition = Evaluator(self.mal_type[1], self.environment).EVAL()
         if isinstance(condition, mal_types.Nil) or isinstance(
@@ -164,7 +164,7 @@ class Evaluator:
 
     def process_regular_list(self):
         """Return None in order to continue evaluation in the while loop,
-        or something other than None to finilize the evaluation.
+        or something other than None to finalize the evaluation.
         """
         evaluated_list = eval_ast(self.mal_type, self.environment)
         function = evaluated_list[0]

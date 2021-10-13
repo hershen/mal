@@ -234,7 +234,7 @@ def seq(mal_type):
     if isinstance(mal_type, mal_types.Vector):  # convert Vector to List
         return mal_types.List(mal_type.list)
 
-    if isinstance(mal_type, mal_types.String):  # convert string to List of charecters
+    if isinstance(mal_type, mal_types.String):  # convert string to List of characters
         return mal_types.List([mal_types.String(char) for char in mal_type])
 
 

@@ -43,7 +43,7 @@ def tokenize(line):
             tokens.append("~@")
             line = line[2:]
 
-        # Special charecters
+        # Special characters
         elif line[0] in special_charecters:
             tokens.append(line[0])
             line = line[1:]
@@ -76,7 +76,7 @@ def tokenize(line):
                     # Found \" - continue searching for closing "
                     tmp_start_index = next_double_quote_index + 1
 
-        # Non-special charecter sequence
+        # Non-special character sequence
         else:
             end_sequence_chars_indices = sorted(
                 [
