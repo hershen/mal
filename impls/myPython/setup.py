@@ -7,14 +7,14 @@ if sys.version_info[0] < 3:
 
 setup(
     name="mal_python",
-    version="1.1",
+    version="1.2",
     author="Alon Hershenhorn",
     author_email="hershen@gmail.com",
     description=(
         "An implementation of the lisp-like programming language mal in Python3."
     ),
     long_description=(
-        "This is an implementation of the lisp-like programming langauge mal.\nIt is implemented in Python3."
+        "This is an implementation of the lisp-like programming language mal.\nIt is implemented in Python3."
     ),
     install_requires=[
         'readline; platform_system == "Linux"',
