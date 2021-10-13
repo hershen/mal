@@ -127,7 +127,7 @@ class Evaluator:
         self.mal_type = expression
 
     def process_do(self):
-        evaluated_list = eval_ast(self.mal_type[1:-1], self.environment)
+        eval_ast(self.mal_type[1:-1], self.environment)  # Return not used on purpose
         self.mal_type = self.mal_type[-1]
 
     def process_if(self):
