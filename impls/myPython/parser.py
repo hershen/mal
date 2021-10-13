@@ -3,26 +3,26 @@ from mal_python import mal_types
 special_charecters = "[]{}()'`~^@"
 
 
-class Reader:
-    """Class to iterate through tokens."""
+class PeakableIterator:
+    """Class to iterate through tokens"""
 
-    def __init__(self, tokens):
-        self.tokens = tokens
+    def __init__(self, elements):
+        self.elements = elements
         self.current_index = 0
 
     def peek(self):
         """Return current token, without advancing to the next token"""
-        return self.tokens[self.current_index]
+        return self.elements[self.current_index]
 
     def next(self):
         """Return current token, and advance to the next token"""
-        current_value = self.tokens[self.current_index]
+        current_value = self.elements[self.current_index]
         self.current_index += 1
 
         return current_value
 
     def empty(self):
-        return self.current_index >= len(self.tokens)
+        return self.current_index >= len(self.elements)
 
 
 def remove_white_spaces(line):
@@ -117,20 +117,22 @@ def is_list_type(token):
     return token[0] in mal_types.closing_paren_style.keys()
 
 
-def parse_quote(reader):
-    quote_symbol = reader.next()
-    return mal_types.List([quote_symbol_to_word[quote_symbol], parse_token(reader)])
+def parse_quote(peakable_iterator):
+    quote_symbol = peakable_iterator.next()
+    return mal_types.List(
+        [quote_symbol_to_word[quote_symbol], parse_tokens(peakable_iterator)]
+    )
 
 
-def parse_with_meta(reader):
-    _ = reader.next()  # This is the carrot symbol
-    first_arg = parse_token(reader)
-    second_arg = parse_token(reader)
+def parse_with_meta(peakable_iterator):
+    _ = peakable_iterator.next()  # This is the carrot symbol
+    first_arg = parse_tokens(peakable_iterator)
+    second_arg = parse_tokens(peakable_iterator)
     return mal_types.List([mal_types.Symbol("with-meta"), second_arg, first_arg])
 
 
-def parse_list(reader):
-    open_paren = reader.next()  # This should be the opening paren type ( [ {
+def parse_list(peakable_iterator):
+    open_paren = peakable_iterator.next()  # This should be the opening paren type ( [ {
 
     if open_paren == "(":
         mal_list_variant = mal_types.List()
@@ -142,10 +144,10 @@ def parse_list(reader):
         raise ValueError(f"Unrecognized open paren {open_paren}")
 
     while True:
-        if reader.empty():
+        if peakable_iterator.empty():
             raise ValueError(f'unbalanced "{mal_list_variant.open_paren}"')
 
-        mal_object = parse_token(reader)
+        mal_object = parse_tokens(peakable_iterator)
 
         if mal_object == mal_list_variant.close_paren:
             break
@@ -187,10 +189,10 @@ def remove_escape_backslash(input_string):
     return "".join(output_string)
 
 
-def parse_single_token(reader):
+def parse_single_token(peakable_iterator):
     """Returns mal type"""
 
-    token = reader.next()
+    token = peakable_iterator.next()
     if isNumber(token):
         return mal_types.Int(token)
 
@@ -213,26 +215,26 @@ def parse_single_token(reader):
         return mal_types.Symbol(token)
 
 
-def parse_token(reader):
+def parse_tokens(peakable_iterator):
     """Peek at next token and parse with the appropriate function"""
 
-    if reader.empty():
+    if peakable_iterator.empty():
         return mal_types.String("")
 
-    next_token = reader.peek()
+    next_token = peakable_iterator.peek()
 
     if is_list_type(next_token):
-        return parse_list(reader)
+        return parse_list(peakable_iterator)
     elif next_token in quote_symbol_to_word.keys():
-        return parse_quote(reader)
+        return parse_quote(peakable_iterator)
     elif next_token == "^":
-        return parse_with_meta(reader)
+        return parse_with_meta(peakable_iterator)
     else:
-        return parse_single_token(reader)
+        return parse_single_token(peakable_iterator)
 
 
 def parse_string(line):
     tokens = tokenize(line)
     tokens = remove_new_lines(tokens)
-    reader = Reader(tokens)
-    return parse_token(reader)
+    peakable_iterator = PeakableIterator(tokens)
+    return parse_tokens(peakable_iterator)
