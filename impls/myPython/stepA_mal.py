@@ -62,16 +62,18 @@ def set_argv():
     repl_environment.set("*ARGV*", args)
 
 
+def load_core_forms():
+    for key, value in core.namespace.items():
+        repl_environment.set(key, value)
+
+
 def define_new_forms():
-    # Define not symbol
     read_eval_print("(def! not (fn* (a) (if a false true)))")
 
-    # Define load-file
     read_eval_print(
         '(def! load-file (fn* (f) (eval (read-string (str "(do " (slurp f) "\nnil)")))))'
     )
 
-    # eval functionality
     def mal_eval(mal_type):
         return evaluator.Evaluator(mal_type, repl_environment).EVAL()
 
@@ -81,12 +83,9 @@ def define_new_forms():
         "(defmacro! cond (fn* (& xs) (if (> (count xs) 0) (list 'if (first xs) (if (> (count xs) 1) (nth xs 1) (throw \"odd number of forms to cond\")) (cons 'cond (rest (rest xs)))))))"
     )
 
-    # host langauge
     read_eval_print('(def! *host-language* "python3")')
 
-    # core forms
-    for key, value in core.namespace.items():
-        repl_environment.set(key, value)
+    load_core_forms()
 
 
 def print_startup_header():

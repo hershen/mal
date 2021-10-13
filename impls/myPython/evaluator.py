@@ -122,7 +122,6 @@ class Evaluator:
                 key, Evaluator(unevaluated_value, let_environment).EVAL()
             )
 
-        # Tail call optimization - instead of return EVAL(expression, let_environment)
         self.environment = let_environment
         expression = self.mal_type[2]
         self.mal_type = expression
@@ -220,7 +219,7 @@ class Evaluator:
                 elif operation_type == "quote":
                     return self.mal_type[1]
 
-                # Supposed to be used for debugging - in practice used to pass all tests
+                # Supposed to be used for debugging - in practice used to pass the tests
                 elif operation_type == "quasiquoteexpand":
                     return core.quasiquote(self.mal_type[1])
 
