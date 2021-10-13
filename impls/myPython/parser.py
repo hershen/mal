@@ -134,11 +134,11 @@ def parse_with_meta(peakable_iterator):
 def parse_list(peakable_iterator):
     open_paren = peakable_iterator.next()  # This should be the opening paren type ( [ {
 
-    if open_paren == "(":
+    if open_paren == mal_types.List.open_paren:
         mal_list_variant = mal_types.List()
-    elif open_paren == "[":
+    elif open_paren == mal_types.Vector.open_paren:
         mal_list_variant = mal_types.Vector()
-    elif open_paren == "{":
+    elif open_paren == mal_types.Hash_map.open_paren:
         mal_list_variant = mal_types.Hash_map()
     else:
         raise ValueError(f"Unrecognized open paren {open_paren}")
