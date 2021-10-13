@@ -6,16 +6,16 @@ from mal_python import mal_types
 
 
 def is_macro_call(mal_type, environment):
-    if isinstance(mal_type, mal_types.List) and isinstance(
-        mal_type[0], mal_types.Symbol
-    ):
-        try:
-            function = environment.get(mal_type[0])
-        except env.MissingKeyInEnvironment:
-            return mal_types.FalseType()
+    if isinstance(mal_type, mal_types.List):
+        function_name = mal_type[0]
+        if isinstance(function_name, mal_types.Symbol):
+            try:
+                function = environment.get(function_name)
+            except env.MissingKeyInEnvironment:
+                return mal_types.FalseType()
 
-        if isinstance(function, mal_types.FunctionState) and function.is_macro:
-            return mal_types.TrueType()
+            if isinstance(function, mal_types.FunctionState) and function.is_macro:
+                return mal_types.TrueType()
 
     return mal_types.FalseType()
 
@@ -79,7 +79,8 @@ class Evaluator:
 
     def process_try(self):
         try:
-            return Evaluator(self.mal_type[1], self.environment).EVAL()
+            try_statement = self.mal_type[1]
+            return Evaluator(try_statement, self.environment).EVAL()
         except Exception as exception:
             try:
                 catch_block = self.mal_type[2]
@@ -101,13 +102,15 @@ class Evaluator:
 
     def process_def(self):
         key = self.mal_type[1]
-        value = Evaluator(self.mal_type[2], self.environment).EVAL()
-        self.environment.set(key, value)
-        return value
+        unevaluated_value = self.mal_type[2]
+        evaluated_value = Evaluator(unevaluated_value, self.environment).EVAL()
+        self.environment.set(key, evaluated_value)
+        return evaluated_value
 
     def process_defmacro(self):
         key = self.mal_type[1]
-        function = Evaluator(self.mal_type[2], self.environment).EVAL()
+        unevaluated_value = self.mal_type[2]
+        function = Evaluator(unevaluated_value, self.environment).EVAL()
         function = copy.deepcopy(function)  # do not mutate original function
         function.is_macro = mal_types.TrueType()
         self.environment.set(key, function)
@@ -128,22 +131,26 @@ class Evaluator:
 
     def process_do(self):
         eval_ast(self.mal_type[1:-1], self.environment)  # Return not used on purpose
-        self.mal_type = self.mal_type[-1]
+        return_value = self.mal_type[-1]
+        self.mal_type = return_value
 
     def process_if(self):
         """Return None in order to continue evaluation in the while loop,
         or something other than None to finalize the evaluation.
         """
-        condition = Evaluator(self.mal_type[1], self.environment).EVAL()
+        unevaluated_condition = self.mal_type[1]
+        condition = Evaluator(unevaluated_condition, self.environment).EVAL()
         if isinstance(condition, mal_types.Nil) or isinstance(
             condition, mal_types.FalseType
         ):
             try:
-                self.mal_type = self.mal_type[3]
+                false_statement = self.mal_type[3]
+                self.mal_type = false_statement
             except IndexError:  # No false expression provided
                 return mal_types.Nil()
         else:
-            self.mal_type = self.mal_type[2]
+            true_statement = self.mal_type[2]
+            self.mal_type = true_statement
 
     def process_fn(self):
         def closure(*args):
@@ -227,7 +234,8 @@ class Evaluator:
                     self.process_quasiquote()
 
                 elif operation_type == "macroexpand":
-                    return expand_macro(self.mal_type[1], self.environment)
+                    macro = self.mal_type[1]
+                    return expand_macro(macro, self.environment)
 
                 else:  # "regular" list
                     return_value = self.process_regular_list()
