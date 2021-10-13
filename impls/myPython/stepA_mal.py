@@ -9,7 +9,7 @@ from mal_python import env
 from mal_python import evaluator
 from mal_python import mal_types
 from mal_python import printer
-from mal_python import reader
+from mal_python import parser
 
 history_size = 1000
 history_directory = os.path.join(os.path.expanduser("~"), ".mal")
@@ -38,7 +38,7 @@ repl_environment = env.Env(mal_types.Nil())
 
 
 def READ(line):
-    return reader.parse_str(str(line))
+    return parser.parse_string(str(line))
 
 
 def PRINT(mal_type):

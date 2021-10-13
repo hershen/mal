@@ -1,11 +1,11 @@
 from mal_python import mal_types
-from mal_python import reader
+from mal_python import parser
 
 
 def add_escape_backslash(input_string):
     input_string_with_escape_chars = "".join(
         [
-            "\\" + char if char in reader.slash_preceded_charecters else char
+            "\\" + char if char in parser.slash_preceded_charecters else char
             for char in input_string
         ]
     )

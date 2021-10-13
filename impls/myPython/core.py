@@ -4,7 +4,7 @@ import time
 
 from mal_python import mal_types
 from mal_python import printer
-from mal_python import reader
+from mal_python import parser
 
 
 class IndexOutOfBounds(Exception):
@@ -257,7 +257,7 @@ namespace = {
     mal_types.Symbol("str"): lambda *x: str_function(*x),
     mal_types.Symbol("prn"): lambda *x: prn(*x),
     mal_types.Symbol("println"): lambda *x: println(*x),
-    mal_types.Symbol("read-string"): lambda x: reader.parse_str(str(x)),
+    mal_types.Symbol("read-string"): lambda x: parser.parse_string(str(x)),
     mal_types.Symbol("slurp"): lambda x: slurp(x),
     mal_types.Symbol("atom"): lambda x: mal_types.Atom(x),
     mal_types.Symbol("atom?"): lambda x: true_false(isinstance(x, mal_types.Atom)),

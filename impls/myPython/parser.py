@@ -231,7 +231,7 @@ def parse_token(reader):
         return parse_single_token(reader)
 
 
-def parse_str(line):
+def parse_string(line):
     tokens = tokenize(line)
     tokens = remove_new_lines(tokens)
     reader = Reader(tokens)
