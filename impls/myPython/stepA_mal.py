@@ -12,6 +12,7 @@ from mal_python import printer
 from mal_python import reader
 
 history_size = 1000
+history_directory = os.path.join(os.path.expanduser("~"), ".mal")
 history_filename = ".history"
 
 
@@ -19,9 +20,9 @@ class CommandHistory:
     """Set up command history, even between mal invocations"""
 
     def __init__(self):
-        self.history_filename = os.path.join(
-            os.path.dirname(__file__), history_filename
-        )
+        os.makedirs(history_directory, exist_ok=True)
+        self.history_filename = os.path.join(history_directory, history_filename)
+
         if not os.path.exists(self.history_filename):
             open(self.history_filename, "a").close()
 
