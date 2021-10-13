@@ -109,7 +109,7 @@ def repl_loop():
             print(e)
         except KeyboardInterrupt:  # Ctrl-C
             print()
-        except EOFError:  # EOF
+        except EOFError:
             print()
             return
 
