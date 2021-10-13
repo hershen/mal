@@ -109,7 +109,7 @@ def quasiquote(mal_type, ignore_unquote=False):
         )
 
     if isinstance(mal_type, mal_types.Symbol) or isinstance(
-        mal_type, mal_types.Hash_map
+        mal_type, mal_types.HashMap
     ):
         return mal_types.List([mal_types.Symbol("quote"), mal_type])
     return mal_type
@@ -164,13 +164,13 @@ def get(hash_map, key):
 
 def assoc(hash_map, *args):
     """
-    Return a new Hash_map, merging new key, value pairs into hash the existing hash_map, taking care to replace new values for exciting keys.
+    Return a new HashMap, merging new key, value pairs into hash the existing hash_map, taking care to replace new values for exciting keys.
     """
     new_list = list(args)
     for key, value in hash_map.items():
         if key not in new_list[::2]:
             new_list += [key, value]
-    return mal_types.Hash_map(new_list)
+    return mal_types.HashMap(new_list)
 
 
 def dissoc(hash_map, *keys):
@@ -179,7 +179,7 @@ def dissoc(hash_map, *keys):
         if key not in keys:
             new_list += [key, value]
 
-    return mal_types.Hash_map(new_list)
+    return mal_types.HashMap(new_list)
 
 
 def readline(string):
@@ -196,7 +196,7 @@ def meta(mal_type):
     if (
         isinstance(mal_type, mal_types.List)
         or isinstance(mal_type, mal_types.Vector)
-        or isinstance(mal_type, mal_types.Hash_map)
+        or isinstance(mal_type, mal_types.HashMap)
         or isinstance(mal_type, mal_types.FunctionState)
         or isinstance(mal_type, mal_types.NativeFunction)
     ):
@@ -297,7 +297,7 @@ namespace = {
         isinstance(mal_type, mal_types.Vector)
     ),
     mal_types.Symbol("map?"): lambda mal_type: true_false(
-        isinstance(mal_type, mal_types.Hash_map)
+        isinstance(mal_type, mal_types.HashMap)
     ),
     mal_types.Symbol("sequential?"): lambda mal_type: true_false(
         isinstance(mal_type, mal_types.List) or isinstance(mal_type, mal_types.Vector)
@@ -305,7 +305,7 @@ namespace = {
     mal_types.Symbol("symbol"): lambda mal_type: mal_types.Symbol(mal_type.string),
     mal_types.Symbol("vector"): lambda *args: mal_types.Vector(args),
     mal_types.Symbol("keyword"): lambda string: make_keyword(string),
-    mal_types.Symbol("hash-map"): lambda *args: mal_types.Hash_map(args),
+    mal_types.Symbol("hash-map"): lambda *args: mal_types.HashMap(args),
     mal_types.Symbol("assoc"): lambda hash_map, *args: assoc(hash_map, *args),
     mal_types.Symbol("dissoc"): lambda hash_map, *keys: dissoc(hash_map, *keys),
     mal_types.Symbol("throw"): lambda err: throw(err),

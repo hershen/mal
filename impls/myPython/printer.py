@@ -19,7 +19,7 @@ def print_string(mal_type, print_readably):
     if isinstance(mal_type, mal_types.String) and print_readably:
         return '"' + str(add_escape_backslash(mal_type)) + '"'
 
-    elif isinstance(mal_type, mal_types.List_variant):
+    elif isinstance(mal_type, mal_types.ListVariant):
         return (
             mal_type.open_paren
             + " ".join(print_string(item, print_readably) for item in mal_type)

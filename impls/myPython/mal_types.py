@@ -8,7 +8,7 @@ class MalException(Exception):
         self.value = value
 
     def __str__(self):
-        if isinstance(self.value, String) or isinstance(self.value, Hash_map):
+        if isinstance(self.value, String) or isinstance(self.value, HashMap):
             return f"Exception {repr(self.value)}"
 
         return repr(self.value)
@@ -110,7 +110,7 @@ class Symbol:
         return self.string
 
 
-class List_variant:
+class ListVariant:
     def __init__(self, *args):
         self.list = list(*args)
         self.meta = Nil()
@@ -146,7 +146,7 @@ class Keyword:
         return self.string
 
 
-class List(List_variant):
+class List(ListVariant):
     open_paren = "("
     close_paren = ")"
 
@@ -168,7 +168,7 @@ class List(List_variant):
         return self.list.index(index)
 
 
-class Vector(List_variant):
+class Vector(ListVariant):
     open_paren = "["
     close_paren = "]"
 
@@ -190,7 +190,7 @@ class Vector(List_variant):
         return self.list.index(index)
 
 
-class Hash_map(List_variant):
+class HashMap(ListVariant):
     open_paren = "{"
     close_paren = "}"
 
@@ -199,12 +199,12 @@ class Hash_map(List_variant):
 
     def __getitem__(self, indices):
         if isinstance(indices, slice):
-            return Hash_map([item for item in self.list[indices]])
+            return HashMap([item for item in self.list[indices]])
         return self.list[indices]
 
     def __eq__(self, other):
         return (
-            isinstance(other, Hash_map)
+            isinstance(other, HashMap)
             and set(self.keys()) == set(other.keys())
             and set(self.values()) == set(other.values())
         )

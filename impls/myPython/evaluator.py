@@ -40,13 +40,13 @@ def eval_ast(mal_type, environment):
             [Evaluator(item, environment).EVAL() for item in mal_type]
         )
 
-    elif isinstance(mal_type, mal_types.Hash_map):
+    elif isinstance(mal_type, mal_types.HashMap):
         eval_only_values = (
             lambda index, item: item
             if index % 2 == 0
             else Evaluator(item, environment).EVAL()
         )
-        return mal_types.Hash_map(
+        return mal_types.HashMap(
             [eval_only_values(index, item) for index, item in enumerate(mal_type)]
         )
 

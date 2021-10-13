@@ -138,8 +138,8 @@ def parse_list(peakable_iterator):
         mal_list_variant = mal_types.List()
     elif open_paren == mal_types.Vector.open_paren:
         mal_list_variant = mal_types.Vector()
-    elif open_paren == mal_types.Hash_map.open_paren:
-        mal_list_variant = mal_types.Hash_map()
+    elif open_paren == mal_types.HashMap.open_paren:
+        mal_list_variant = mal_types.HashMap()
     else:
         raise ValueError(f"Unrecognized open paren {open_paren}")
 
