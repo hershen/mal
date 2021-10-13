@@ -69,7 +69,7 @@ When a `hash-map` is evaluated, all the values (odd elements) are evaluated.
 | `def!` | A new symbol name and an expression | Defines a new symbol name with the value of the evaluated expression | `(def! new (+ 1 2))` &rArr; `3` <br /> `new` &rArr; `3` |
 | `let*` | A `list` with key value pairs, and an expression | The expression is evaluated using the additional symbols defined in the `list` | `(let* (c 2) c)` &rArr; `2` <br /> `(let* (z (+ 2 3)) (+ 1 z))` &rArr; `6` |
 | `do` | A series of elements | Evaluate all the elements, returning the last evaluated element | `(do (def! a 6) 7 (+ a 8))` &rArr; `14` |
-| `if` | a condition, an expression for true, and an optional expression for false | The evaluated expression for true if the condition evaluates to anything other than `nil` or `false`, or the evalauted expression for false, otherwise. If the condition evaluates to false and there is no expression for false, returns `nil`. | `(if true (+ 0 1) (+ 1 1))` &rArr; `1` <br /> `(if false (+ 0 1) (+ 1 1))` &rArr; `2` <br /> `(if false (+ 0 1))` &rArr; `nil` |
+| `if` | a condition, an expression for true, and an optional expression for false | The evaluated expression for true if the condition evaluates to anything other than `nil` or `false`, or the evaluated expression for false, otherwise. If the condition evaluates to false and there is no expression for false, returns `nil`. | `(if true (+ 0 1) (+ 1 1))` &rArr; `1` <br /> `(if false (+ 0 1) (+ 1 1))` &rArr; `2` <br /> `(if false (+ 0 1))` &rArr; `nil` |
 | `fn*` | A `list` of symbols and an expression | A function object that evaluates the expression with the symbols from the `list` as arguments. A function object is meant to be called with a series of expressions matching the arguments. | `( (fn* (a b) (+ b a)) 3 4)` &rArr; `7` <br /> `(def! fib (fn* (N) (if (= N 0) 1 (if (= N 1) 1 (+ (fib (- N 1)) (fib (- N 2)))))))` &rArr; `#<function>` <br /> `(fib 5)` &rArr; `8` |
 | `cons` | A `mal` type and (a List or Vector) | A new List composed of the `mal` type and the elements of the List or the Vector | `(cons 1 (list 1 2 3))` &rArr; `(1 1 2 3)` |
 | `concat` | 0 or combinations of Lists and Vectors | A new list containing the elements of the input Lists and Vectors | `(concat (list 1 2) (list 3 4))` &rArr; `(1 2 3 4)` |
@@ -81,18 +81,18 @@ When a `hash-map` is evaluated, all the values (odd elements) are evaluated.
 | `defmacro` | | A macro - a new piece of code. The arguments are evaluated lazily, when they are needed. So this can be never (for example, for the second argument of an `or`. A regular `def!` greedily evaluates all arguments. The arguments of a macro don't have to be valid expressions. They have to be valid only when the macro is called. | `(defmacro! twicem (fn* (e) (do ~e ~e)))` &rArr; `#<function>` <br /> `(twicem (prn "foo"))` &rArr; `foo foo nil`. <br /> A regular `def!`: `(def! twice (fn* (e) (do ~e ~e)))` &rArr; `#<function>` <br />  `(twice (prn "foo"))` &rArr; `foo (do nil nil)` |
 | `nth` | A List or Vector and an index number | The element in the List or Vector at position index | `(nth (list 1 2) 1)` &rArr; `2` |
 | `first` | A List or Vector | The first element in the List or Vector. If the List or Vectors are empty, or are Nil, Nil is returned. | `(first (list 7 8 9))` &rArr; `7` <br /> `(first nil)` &rArr; `nil` |
-| `rest` | A List or Vector | A new List containing all the elements of the List or Vector, excpet the first. If the List or Vectors are empty, or are Nil, an empty List is returned. | `(rest (list 7 8 9))` &rArr; `(8 9)` <br /> `(rest nil)` &rArr; `()` |
+| `rest` | A List or Vector | A new List containing all the elements of the List or Vector, except the first. If the List or Vectors are empty, or are Nil, an empty List is returned. | `(rest (list 7 8 9))` &rArr; `(8 9)` <br /> `(rest nil)` &rArr; `()` |
 | `cond` | A List containing an even number of elements | The elements are treated in pairs. The first element of a pair is a condition. The second is a value. `cond` returns the first value for which the condition is true. | `(cond false 7 (= 2 2) 8 "else" 9)` &rArr; `8` <br /> `(cond false 7 (= 2 5) 8 "else" 9)` &rArr; `9` |
 
 
 ## Reader macro
 
-| Function | Explanatoin | Example |
+| Function | Explanation | Example |
 |  ---     | ---         | ---     |
-| `'` | Equivalnt to `quote` | `'(list 1 2)` &rArr; `(list 1 2)` |
-| ``` `` | Equivalnt to `quasiquote` | `(1 2 (3 4))` &rArr; `(1 2 (3 4))` |
-| `~` | Equivalnt to `unquote` | `(def! a 8)` &rArr; `8` <br /> `(1 ~a 3)` &rArr; `(1 8 3)` |
-| `~@` | Equivalnt to `splice-unquote` | `(def! c (list 2))` &rArr; `(2)` <br /> `(1 ~@c 3)` &rArr; `(1 2 3)` |
+| `'` | Equivalent to `quote` | `'(list 1 2)` &rArr; `(list 1 2)` |
+| ``` `` | Equivalent to `quasiquote` | `(1 2 (3 4))` &rArr; `(1 2 (3 4))` |
+| `~` | Equivalent to `unquote` | `(def! a 8)` &rArr; `8` <br /> `(1 ~a 3)` &rArr; `(1 8 3)` |
+| `~@` | Equivalent to `splice-unquote` | `(def! c (list 2))` &rArr; `(2)` <br /> `(1 ~@c 3)` &rArr; `(1 2 3)` |
 
 
 
