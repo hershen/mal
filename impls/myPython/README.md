@@ -10,6 +10,16 @@ As Python3 has a maximum recursion depth, the implementation incorporates [Tail 
 
 The `mal` language is self-hosting, meaning a `mal` interpreter can run an implementation of a `mal` interpreter written in the `mal` language. All the functional tests can be run in self hosting mode.
 
+## Examples
+Some examples of what can be run with the interpreter.
+
+### Calculate the Fibonacci numbers
+`(def! fib (fn* (N) (if (= N 0) 0 (if (= N 1) 1 (+ (fib (- N 1)) (fib (- N 2)))))))`
+
+Then:
+
+`(fib 8)` &rArr; `21`
+
 ## Requirements
 - A Python3 interpreter, version >= 3.6.
 
@@ -47,6 +57,7 @@ This will run all the functional tests (provided as part of the [mal](https://gi
 | `nil` | Similar to Python's `NoneType` | `nil` |
 | `true` | `mal`'s true type | `true` |
 | `false` | `mal`'s false type | `false` |
+| `atom` | Holds a reference to a `mal` type. This is the only mutable `mal` type. | `(atom 2)` |
 | `list` | A series of `mal` types, separated by spaces, delimited by brackets (`()`). | `("a" 1)` | 
 | `vector` | Similar to `list`s, but use square brackets (`[]`) as delimiters. | `["a" 1]` |
 | `hash-map` | Data structure that maps `string`s and `keywords` into other `mal` types. Delimited with curly braces (`{}`). The odd entries are the keys and the even entries are the values. | `{"a" 1 :k "str"}` |
@@ -63,7 +74,7 @@ When a `list` is processed, the first element is invoked or executed on the rest
 When a `vector` is evaluated, each individual element is evaluated.
 When a `hash-map` is evaluated, all the values (odd elements) are evaluated.
 
-| Function | Input | Output | Example |
+| Function | Input | Output/Effects | Example |
 |  ---     | ---   | ---    | ---     |
 |  |  | | |
 | `def!` | A new `symbol` name and an expression | Defines a new `symbol` name with the value of the evaluated expression | `(def! new (+ 1 2))` &rArr; `3` <br /> `new` &rArr; `3` |
@@ -71,12 +82,20 @@ When a `hash-map` is evaluated, all the values (odd elements) are evaluated.
 | `do` | A series of elements | Evaluate all the elements, returning the last evaluated element | `(do (def! a 6) 7 (+ a 8))` &rArr; `14` |
 | `if` | a condition, an expression for true, and an optional expression for false | The evaluated expression for true if the condition evaluates to anything other than `nil` or `false`, or the evaluated expression for false, otherwise. If the condition evaluates to false and there is no expression for false, returns `nil`. | `(if true (+ 0 1) (+ 1 1))` &rArr; `1` <br /> `(if false (+ 0 1) (+ 1 1))` &rArr; `2` <br /> `(if false (+ 0 1))` &rArr; `nil` |
 | `fn*` | A `list` of `symbol`s and an expression | A function object that evaluates the expression with the symbols from the `list` as arguments. A function object is meant to be called with a series of expressions matching the arguments. | `( (fn* (a b) (+ b a)) 3 4)` &rArr; `7` <br /> `(def! fib (fn* (N) (if (= N 0) 1 (if (= N 1) 1 (+ (fib (- N 1)) (fib (- N 2)))))))` &rArr; `#<function>` <br /> `(fib 5)` &rArr; `8` |
+| `slurp` | A string that represents a file name | The contents of the file as a string | `(slurp "hello-world.txt")` &rArr; `"hello world!\n"`|
+| `read-string` |  | | |
+| `eval` | A `mal` expression | The evaluated `mal` expression | `(def! expression (list + 1 2))` <br /> `(eval expression)` &rArr; `3` |
+| `load-file` | A filename as a string | The `mal` code in the file is processed as if it was entered into the interpreter | `(load-file "increase4.mal")` <br /> `(increase4 1)` &rArr; `5` |
+| `atom` | A `mal` value | An atom that references the `mal` value | `(def! a (atom 2))`|
+| `atom?` | A `mal` value | Returns true if the value is an atom | `(def! a (atom 2))` <br /> `(atom? a)` &rArr; `true` |
+| `deref` | An atom | The value referenced by the atom. The `@` macro has the same functionality. | `(def! a (atom 2))` <br /> `(deref a)` &rArr; `2` <br /> `@a` &rArr; `2` |
 | `cons` | A `mal` type and (a List or Vector) | A new List composed of the `mal` type and the elements of the List or the Vector | `(cons 1 (list 1 2 3))` &rArr; `(1 1 2 3)` |
 | `concat` | 0 or combinations of Lists and Vectors | A new list containing the elements of the input Lists and Vectors | `(concat (list 1 2) (list 3 4))` &rArr; `(1 2 3 4)` |
 | `quote` | A `mal` type | The `mal` type. If the `mal` type is not defined, treats it like a `symbol` and returns the name of the `symbol`. | `(quote abc)` &rArr; `abc` |
 | `quasiquote` | A `mal` type | The same as `quote`, unless `mal` type is a list starting with `unquote` or `splice-unquote`. These are detailed below. | `(quasiquote abc)` &rArr; `abc`  |
 | `unquote` | A `mal` type | Meant to be used inside a `quasiquote` evaluation. Replaces the call to itself with the evaluated form of the argument. | `(def! lst (quote (b c)))` &rArr; `(b c)`, `(quasiquote (a (unquote lst) d))` &rArr; `(a (b c) d)` |
 | `splice-unquote` | A List | Meant to be used inside a `quasiquote` evaluation. Replaces the call to itself with the contents of the List. | `(def! lst (quote (b c)))` &rArr; `(b c)`, `(quasiquote (a (splice-unquote lst) d))` &rArr; `(a b c d)` |
+| `vec` | A list or a vector | A vector with the same elements as in the input | `(vec (list 1 2))` &rArr; `[1 2]` |
 | `defmacro` | A new `symbol` name and an expression | A macro - a new piece of code. The arguments are evaluated lazily, when they are needed. So this can be never (for example, for the second argument of an `or`. A regular `def!` greedily evaluates all arguments. The arguments of a macro don't have to be valid expressions. They have to be valid only when the macro is called. | ``(defmacro! twicem (fn* (e) `(do ~e ~e)))`` &rArr; `#<function>` <br /> `(twicem (prn "foo"))` &rArr; `foo foo nil`. <br /> A regular `def!`: ``(def! twice (fn* (e) `(do ~e ~e)))`` &rArr; `#<function>` <br />  `(twice (prn "foo"))` &rArr; `foo (do nil nil)` |
 | `(try* A (catch* B C))` | Expression `A`, `B`, and `C` | Expression `A` is evaluated. If an exception is thrown, expression `C` is evaluated with `B` bound to the value of the thrown exception. | `(try* abc (catch* exc (prn "exc is:" exc)))` &rArr; `"exc is:" "'abc' not found"` |
 | `throw` | A value | Raises the value as an exception | `(try* (throw "my exception") (catch* exc (prn "exc:" exc)))` &rArr; `"exc:" "my exception"` |
@@ -112,7 +131,6 @@ When a `hash-map` is evaluated, all the values (odd elements) are evaluated.
 | `contains?` | A `hash-map` and a key | `true` if the key is a in the `hash-map` | `(contains? {1 2 3 4} 3)` &rArr; `true` |
 | `readline` | A `string` | Prints the `string`, reads text from the user and prints it back | |
 
-
 ## Reader macro
 
 | Function | Explanation | Example |
@@ -120,6 +138,7 @@ When a `hash-map` is evaluated, all the values (odd elements) are evaluated.
 | `'` | Equivalent to `quote` | `'(list 1 2)` &rArr; `(list 1 2)` |
 | ``` `` | Equivalent to `quasiquote` | `(1 2 (3 4))` &rArr; `(1 2 (3 4))` |
 | `~` | Equivalent to `unquote` | `(def! a 8)` &rArr; `8` <br /> `` `(1 ~a 3)`` &rArr; `(1 8 3)` |
+| `@` | Equivalent to `deref` | `(def! a (atom 2))` <br /> `@a` &rArr; `2` |
 | `~@` | Equivalent to `splice-unquote` | `(def! c (list 2))` &rArr; `(2)` <br /> `` `(1 ~@c 3)`` &rArr; `(1 2 3)` |
 
 
