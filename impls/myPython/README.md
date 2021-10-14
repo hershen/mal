@@ -10,15 +10,13 @@ As Python3 has a maximum recursion depth, the implementation incorporates [Tail 
 
 The `mal` language is self-hosting, meaning a `mal` interpreter can run an implementation of a `mal` interpreter written in the `mal` language. All the functional tests can be run in self hosting mode.
 
-## Examples
-Some examples of what can be run with the interpreter.
 
-### Calculate the Fibonacci numbers
-`(def! fib (fn* (N) (if (= N 0) 0 (if (= N 1) 1 (+ (fib (- N 1)) (fib (- N 2)))))))`
+## Example - Fibonacci numbers
+`(def! fib (fn* (N) (if (= N 0) 0 (if (= N 1) 1 (+ (fib (- N 1)) (fib (- N 2))))))) ; Define the Fibonacci sequence function`
 
-Then:
+`(fib 8) ; Calcualte the 8'th Fibonacci number`
 
-`(fib 8)` &rArr; `21`
+Output: `21`
 
 ## Requirements
 - A Python3 interpreter, version >= 3.6.
